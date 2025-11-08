@@ -1,7 +1,6 @@
 import express from 'express';
 import Post from '../models/postModel.js';
 import asyncHandler from 'express-async-handler';
-import Blog from '../../../FlamezBlog/backend/models/blogModels.js';
 
 //Create post 
 const createPost = asyncHandler(async (req, res, next) => {
