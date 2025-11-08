@@ -20,7 +20,7 @@ const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/echox';
 app.use(cors({
     origin: [
         'http://localhost:3000',
-        'https://echox-backend.onrender.com',
+        'https://echox-wzh0.onrender.com',
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
