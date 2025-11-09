@@ -3,19 +3,41 @@ import { useGetOneAnonymousQuery } from '../slices/ghostApiSlice.js'
 import { useLikeAnonymousMutation } from '../slices/ghostApiSlice.js';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'; // Add useEffect
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import {toast} from 'react-toastify';
 
 const Ghostid = () => {
     const { id } = useParams();
-    const { data: post, refetch } = useGetOneAnonymousQuery(id);
+    const { data: post, isLoading, refetch } = useGetOneAnonymousQuery(id);
     const [likeAnonymous] = useLikeAnonymousMutation();
     
     const [localLikes, setLocalLikes] = useState({});
     
     const { userInfo } = useSelector((state) => state.auth);
     const userId = userInfo?.id;
+
+    // Loading state
+    if (isLoading) {
+        return (
+            <div className="Posts">
+                <div className="high loading-skeleton">
+                    <div className="profileSide">
+                        <div className="postProfile">
+                            <div className="skeleton-avatar"></div>
+                            <div className="skeleton-text"></div>
+                        </div>
+                    </div>
+                    <div className="skeleton-line"></div>
+                    <div className="skeleton-line" style={{width: '60%'}}></div>
+                    <div className="postAction">
+                        <div className="skeleton-button"></div>
+                        <div className="skeleton-button"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     // Initialize localLikes when post data loads
     useEffect(() => {
@@ -26,7 +48,7 @@ const Ghostid = () => {
                 [post._id]: isCurrentlyLiked
             }));
         }
-    }, [post, userId]); // This runs when post data or userId changes
+    }, [post, userId]);
 
     const handleLike = async (post) => {
         const postId = post._id;

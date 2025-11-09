@@ -39,7 +39,7 @@ const getPosts = asyncHandler(async (req, res, next) => {
 //Get single post
 const getPost = asyncHandler(async (req, res, next) => {
           const id = req.params.id;
-            const post = await Post.findById(id);
+            const post = await Post.findById(id).populate('user', 'username profile');
 
             if(!post) {
                 res.status(404);
@@ -106,14 +106,20 @@ const deletePost = asyncHandler(async (req, res, next) => {
 const likePost = asyncHandler(async (req, res, next) => {
     const post = await Post.findById(req.params.id);
 
-    if(!post) {
-        res.status(404);
-        throw new Error('The post wey you wan like no dey');
+        // Check if user already liked
+    const alreadyLiked = post.likedBy.includes(req.user._id);
+
+ if (alreadyLiked) {
+        // Unlike
+        post.like -= 1;
+        post.likedBy.pull(req.user._id);
+    } else {
+        // Like
+        post.like += 1;
+        post.likedBy.push(req.user._id);
     }
 
-    post.Likes += 1;
     await post.save();
-
     res.status(200).json(post);
 });
 

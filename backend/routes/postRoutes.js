@@ -40,11 +40,11 @@ cloudinary.api.ping()
 
 router.post('/upload', protect, upload.single('image'), createPost);
 router.get('/', protect, getPosts);
-router.get('/post/:id', protect, getPost);
+router.get('/:id', protect, getPost);
 router.get('/search/:text', protect, searchPost);
 router.get('/user-post', protect, userPosts);
 router.put('/edit-post', protect, editPost);
 router.post('/delete', protect, deletePost);
-router.put('/:id/like', protect, likePost);
+router.patch('/:id/like', protect, likePost);
 
 export default router;

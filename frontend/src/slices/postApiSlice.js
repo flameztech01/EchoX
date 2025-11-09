@@ -16,6 +16,18 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 url: `${POST_URL}/`,
                 method: 'GET',
             })
+        }),
+        getOnePost: builder.query({
+            query: (id) => ({
+                url: `${POST_URL}/${id}`,
+                method: 'GET'
+            })
+        }),
+        likePost: builder.mutation({
+            query: (id) => ({
+                url: `${POST_URL}/${id}/like`,
+                method: 'PATCH'
+            })
         })
     })
 })
@@ -23,4 +35,6 @@ export const postApiSlice = apiSlice.injectEndpoints({
 export const {
     useCreatePostMutation,
     useGetPostsQuery,
+    useGetOnePostQuery,
+    useLikePostMutation,
 } = postApiSlice;
