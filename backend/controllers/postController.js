@@ -26,7 +26,7 @@ const createPost = asyncHandler(async (req, res, next) => {
 
 //Get all posts
 const getPosts = asyncHandler(async (req, res, next) => {
-    const posts = await Post.find().sort({ createdAt: -1 });
+    const posts = await Post.find().sort({ createdAt: -1 }).populate('user', 'username profile');
 
     if (!posts) {
         res.status(404);
@@ -66,7 +66,9 @@ const searchPost = asyncHandler(async (req, res, next) => {
 const userPosts = asyncHandler(async (req, res, next) => {
     const userId = req.user._id;
 
-    const userPost = await Blog.find({user: userId}).sort({createdAt: -1})
+    const userPost = await Post.find({user: userId}).sort({createdAt: -1})
+
+    res.status(200).json(userPost);
 });
 
 //Edit Post 

@@ -1,20 +1,29 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import { useGetPostsQuery } from '../slices/postApiSlice.js';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 const Viewposts = () => {
+  const {data: posts} = useGetPostsQuery();
+  const {userInfo} = useSelector((state) => state.auth);
+      const userId = userInfo?.id;
+
   return (
-    <div className='high'>
-      <div className="profileSide">
+    <div>
+      {posts?.map((post) => (
+        <div className='high'>
+             <div className="profileSide">
             <div className="postProfile">
-                <img src="/mountain.jpg" alt="" />
-                <Link to="/profile">Json Peterson</Link>
+                <img src={post?.user.profile} alt="" />
+                <Link to={`/profile/${post.user._id}`}>{post?.user.username}</Link>
             </div>
             <div className="postFoll">
                 <button type='follow'>Follow</button>
             </div>
       </div>
-      <h2>The sunshine is really amazing</h2>
-      <img src="/mountain.jpg" alt="" className='postImg'/>
+      <h2>{post.text}</h2>
+      <img src={post.image} alt="" className='postImg'/>
       <div className="postAction">
           <div className="likes-count">
                 <input type="checkbox" id='heart' />
@@ -27,6 +36,8 @@ const Viewposts = () => {
             <Link to="/post/:id">2k Comments</Link>
         </div>
       </div>
+        </div>
+      ))}
     </div>
   )
 }

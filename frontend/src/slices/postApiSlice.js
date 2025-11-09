@@ -11,9 +11,16 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 body: formData
             })
         }),
+        getPosts: builder.query({
+            query: () => ({
+                url: `${POST_URL}/`,
+                method: 'GET',
+            })
+        })
     })
 })
 
 export const {
     useCreatePostMutation,
+    useGetPostsQuery,
 } = postApiSlice;
