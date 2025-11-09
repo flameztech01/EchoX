@@ -64,7 +64,7 @@ const Signin = () => {
             <a href=""><img src="/google.png" alt="" />Google</a>
             <a href=""><img src="/facebook.png" alt="" />Facebook</a>
           </div>
-          <p>Don't have an account? <span><Link to="/signup">Sign up</Link></span></p>
+          <p>Don't have an account? <span><Link to="/signup">Sign In</Link></span></p>
       </form>
     </div>
   )
