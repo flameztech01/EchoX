@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import {toast} from 'react-toastify';
+import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
 
 const Ghostid = () => {
     const { id } = useParams();
@@ -16,28 +17,6 @@ const Ghostid = () => {
     
     const { userInfo } = useSelector((state) => state.auth);
     const userId = userInfo?.id;
-
-    // Loading state
-    if (isLoading) {
-        return (
-            <div className="Posts">
-                <div className="high loading-skeleton">
-                    <div className="profileSide">
-                        <div className="postProfile">
-                            <div className="skeleton-avatar"></div>
-                            <div className="skeleton-text"></div>
-                        </div>
-                    </div>
-                    <div className="skeleton-line"></div>
-                    <div className="skeleton-line" style={{width: '60%'}}></div>
-                    <div className="postAction">
-                        <div className="skeleton-button"></div>
-                        <div className="skeleton-button"></div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     // Initialize localLikes when post data loads
     useEffect(() => {
@@ -79,6 +58,28 @@ const Ghostid = () => {
         return localLikes[post._id] ?? post.likedBy?.includes(userId);
     };
 
+    // Loading state - MOVED AFTER ALL HOOKS
+    if (isLoading) {
+        return (
+            <div className="Posts">
+                <div className="high loading-skeleton">
+                    <div className="profileSide">
+                        <div className="postProfile">
+                            <div className="skeleton-avatar"></div>
+                            <div className="skeleton-text"></div>
+                        </div>
+                    </div>
+                    <div className="skeleton-line"></div>
+                    <div className="skeleton-line" style={{width: '60%'}}></div>
+                    <div className="postAction">
+                        <div className="skeleton-button"></div>
+                        <div className="skeleton-button"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className='Posts'>
             {post && (
@@ -92,26 +93,23 @@ const Ghostid = () => {
                     <h2>{post.text}</h2>
                     <div className="postAction">
                         <div className="likes-count">
-                            <input 
-                                type="checkbox" 
-                                onChange={() => handleLike(post)}
-                                id={`heart-${post._id}`}
-                                checked={isLiked(post)}
-                            />
-                            <label 
-                                htmlFor={`heart-${post._id}`}
-                                style={{ 
-                                    color: isLiked(post) ? 'red' : 'grey' 
-                                }}
+                            <button 
+                                className="icon-btn"
+                                onClick={() => handleLike(post)}
                             >
-                                &#10084;
-                            </label>
-                            <p>{post.like} Likes</p>
+                                {isLiked(post) ? (
+                                    <FaHeart className="icon liked" />
+                                ) : (
+                                    <FaRegHeart className="icon" />
+                                )}
+                            </button>
+                            <p>{post.like || 0} Likes</p>
                         </div>
                         <div className="likes-count">
-                            <input type="checkbox" id={`bookmark-${post._id}`} />
-                            <label htmlFor={`bookmark-${post._id}`}>💬</label>
-                            <Link to={`/anonymous/${post._id}`}>{post.comments} Comments</Link>
+                            <Link to={`/post/${post._id}`} className="icon-btn">
+                                <FaRegComment className="icon" />
+                            </Link>
+                            <Link to={`/post/${post._id}`}>Comments</Link>
                         </div>
                     </div>
                 </div>

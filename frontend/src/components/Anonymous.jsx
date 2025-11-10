@@ -1,53 +1,61 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
-import { useGetAnonymousQuery } from '../slices/ghostApiSlice.js'
-import { useLikeAnonymousMutation } from '../slices/ghostApiSlice.js'
-import {toast} from 'react-toastify';
+import { useGetAnonymousQuery, useLikeAnonymousMutation } from '../slices/ghostApiSlice.js'
+import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
+import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
 
 const Anonymous = () => {
-  const { data: anonymousPosts, refetch } = useGetAnonymousQuery({
-     pollingInterval: 1000, // Refetch every 1 second
-  refetchOnFocus: true,
-  refetchOnReconnect: true
-  });
+  const { data: anonymousPosts, isLoading, refetch } = useGetAnonymousQuery();
   const [likeAnonymous] = useLikeAnonymousMutation();
-  const [localLikes, setLocalLikes] = useState({}); // { postId: boolean }
-
   const { userInfo } = useSelector((state) => state.auth);
-  const userId = userInfo?.id;
 
-  useEffect(() => {
-    refetch();
-  });
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="Posts">
+        {[...Array(3)].map((_, index) => (
+          <div className="high loading-skeleton" key={index}>
+            <div className="profileSide">
+              <div className="postProfile">
+                <div className="skeleton-avatar"></div>
+                <div className="skeleton-text"></div>
+              </div>
+            </div>
+            <div className="skeleton-line"></div>
+            <div className="skeleton-line" style={{width: '60%'}}></div>
+            <div className="postAction">
+              <div className="skeleton-button"></div>
+              <div className="skeleton-button"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
-  const handleLike = async (post) => {
-    const postId = post._id;
-    const currentlyLiked = localLikes[postId] ?? post.likedBy?.includes(userId);
-
-    // IMMEDIATE UI UPDATE
-    setLocalLikes(prev => ({
-      ...prev,
-      [postId]: !currentlyLiked
-    }));
-
+  const handleLike = async (postId) => {
+    console.log('Liking post:', postId);
+    console.log('Current user ID:', userInfo?._id);
+    
     try {
-      await likeAnonymous(postId).unwrap();
-      // Refetch to get updated counts from server
-
+      const result = await likeAnonymous(postId).unwrap();
+      console.log('Like API response:', result);
+      refetch();
     } catch (error) {
       console.error('Like failed:', error);
       toast.error(error.message || 'Failed to like the post.');
-      // REVERT ON ERROR
-      setLocalLikes(prev => ({
-        ...prev,
-        [postId]: currentlyLiked // revert to previous state
-      }));
     }
   };
 
   const isLiked = (post) => {
-    return localLikes[post._id] ?? post.likedBy?.includes(userId);
+    console.log('=== CHECKING LIKE STATUS ===');
+    console.log('Post ID:', post._id);
+    console.log('User ID:', userInfo?._id);
+    console.log('Post likedBy array:', post.likedBy);
+    console.log('Is user in likedBy:', post.likedBy?.includes(userInfo?._id));
+    
+    return post.likedBy?.includes(userInfo?._id);
   };
 
   return (
@@ -61,28 +69,25 @@ const Anonymous = () => {
             </div>
           </div>
           <h2>{post.text}</h2>
-          <div className="postAction">
+         <div className="postAction">
             <div className="likes-count">
-              <input 
-                type="checkbox" 
-                onChange={() => handleLike(post)}
-                id={`heart-${post._id}`}
-                checked={isLiked(post)}
-              />
-              <label 
-                htmlFor={`heart-${post._id}`}
-                style={{ 
-                  color: isLiked(post) ? 'red' : 'grey' 
-                }}
+              <button 
+                className="icon-btn"
+                onClick={() => handleLike(post._id)}
               >
-                &#10084;
-              </label>
-              <p>{post.like} Likes</p>
+                {isLiked(post) ? (
+                  <FaHeart className="icon liked"  />
+                ) : (
+                  <FaRegHeart className="icon" />
+                )}
+              </button>
+              <p>{post.like || 0} Likes</p>
             </div>
             <div className="likes-count">
-              <input type="checkbox" id={`bookmark-${post._id}`}  />
-              <label htmlFor={`bookmark-${post._id}`}>💬</label>
-              <Link to={`/anonymous/${post._id}`}>{post.comments} Comments</Link>
+              <Link to={`/post/${post._id}`} className="icon-btn">
+                <FaRegComment className="icon" />
+              </Link>
+              <Link to={`/anonymous/${post._id}`}>Comments</Link>
             </div>
           </div>
         </div>

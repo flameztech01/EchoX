@@ -8,11 +8,11 @@ const anonymousSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
-    author: [{
+    author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    }],
+    },
     createdAt: {type: Date, default: Date.now}
 }, {
     timestamps: true

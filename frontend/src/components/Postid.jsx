@@ -1,59 +1,32 @@
 import React from 'react'
-import { useGetOnePostQuery } from '../slices/postApiSlice.js';
-import { useLikePostMutation } from '../slices/postApiSlice.js';
+import { useGetOnePostQuery, useLikePostMutation } from '../slices/postApiSlice.js';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { useState, useEffect } from 'react';
+import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
 
 const Postid = () => {
   const { id } = useParams();
   const { data: post, isLoading, refetch } = useGetOnePostQuery(id);
   const [likePost] = useLikePostMutation();
-
-  const [localLikes, setLocalLikes] = useState({});
   const { userInfo } = useSelector((state) => state.auth);
-  const userId = userInfo?.id;
-
-  // Initialize localLikes when post data loads
-  useEffect(() => {
-    if (post && userId) {
-      const isCurrentlyLiked = post.likedBy?.includes(userId);
-      setLocalLikes(prev => ({
-        ...prev,
-        [post._id]: isCurrentlyLiked
-      }));
-    }
-  }, [post, userId]);
 
   const handleLike = async (postId) => {
-    const currentlyLiked = localLikes[postId] ?? post.likedBy?.includes(userId);
-
-    // IMMEDIATE UI UPDATE
-    setLocalLikes(prev => ({
-      ...prev,
-      [postId]: !currentlyLiked
-    }));
-
     try {
       await likePost(postId).unwrap();
-      await refetch();
+      await refetch(); // Refresh to get updated like status from server
     } catch (error) {
       console.error('Like failed:', error);
       toast.error(error.message || 'Failed to like the post.');
-      setLocalLikes(prev => ({
-        ...prev,
-        [postId]: currentlyLiked
-      }));
     }
   };
 
   const isLiked = (post) => {
-    return localLikes[post._id] ?? post.likedBy?.includes(userId);
+    return post.likedBy?.includes(userInfo?._id);
   };
 
-  // Loading state - moved to AFTER all hooks
+  // Loading state
   if (isLoading) {
     return (
       <div className="peak">
@@ -93,18 +66,22 @@ const Postid = () => {
           <img src={post.image} alt="" className='postImg'/>
           <div className="postAction">
             <div className="likes-count">
-              <input 
-                type="checkbox" 
-                id={`heart-${post._id}`} 
-                checked={isLiked(post)}
-                onChange={() => handleLike(post._id)}
-              />
-              <label htmlFor={`heart-${post._id}`}>&#10084;</label>
+              <button 
+                className="icon-btn"
+                onClick={() => handleLike(post._id)}
+              >
+                {isLiked(post) ? (
+                  <FaHeart className="icon liked" />
+                ) : (
+                  <FaRegHeart className="icon" />
+                )}
+              </button>
               <p>{post.like || 0} Likes</p>
             </div>
             <div className="likes-count">
-              <input type="checkbox" id={`bookmark-${post._id}`} />
-              <label htmlFor={`bookmark-${post._id}`}>💬</label>
+              <Link to={`/post/${post._id}`} className="icon-btn">
+                <FaRegComment className="icon" />
+              </Link>
               <Link to={`/post/${post._id}`}>Comments</Link>
             </div>
           </div>

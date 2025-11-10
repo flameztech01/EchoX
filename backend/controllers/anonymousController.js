@@ -20,7 +20,7 @@ const postAnonymous = asyncHandler(async (req, res, next) => {
 
 //Get anonymous
 const getAnonymous = asyncHandler(async (req, res, next) => {
-    const anonymous = await Anonymous.find().sort({ createdAt: -1 }).populate('likedBy');
+    const anonymous = await Anonymous.find().sort({ createdAt: -1 });
 
     if(!anonymous) {
         res.status(404);
@@ -32,7 +32,7 @@ const getAnonymous = asyncHandler(async (req, res, next) => {
 
 const getOneAnonymous = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const anonymous = await Anonymous.findById(id).populate('likedBy');
+    const anonymous = await Anonymous.findById(id);
 
     if(!anonymous) {
         res.status(404);
