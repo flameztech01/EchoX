@@ -57,7 +57,7 @@ const googleAuth = asyncHandler(async (req, res, next) => {
         }
     }
 
-    // Rest of your existing code remains the same...
+    // Check if user already exists with this Google ID
     let user = await User.findOne({ 
         $or: [
             { googleId },
@@ -65,14 +65,43 @@ const googleAuth = asyncHandler(async (req, res, next) => {
         ]
     });
 
+    console.log('Found user:', user);
+
     if (user) {
+        // If user exists but doesn't have googleId, update it
         if (!user.googleId) {
             user.googleId = googleId;
             user.isVerified = true;
             await user.save();
         }
     } else {
-        // Create new user... (your existing code)
+        // CREATE NEW USER - THIS WAS MISSING!
+        const baseUsername = email.split('@')[0] || name.toLowerCase().replace(/\s+/g, '');
+        let username = baseUsername;
+        let counter = 1;
+
+        // Ensure username is unique
+        while (await User.findOne({ username })) {
+            username = `${baseUsername}${counter}`;
+            counter++;
+        }
+
+        user = await User.create({
+            googleId,
+            name: name || '',
+            username,
+            email,
+            profile: picture || '',
+            password: `google-auth-${googleId}`,
+            isVerified: true,
+            authMethod: 'google'
+        });
+        console.log('Created new user:', user);
+    }
+
+    // Check if user was properly created/retrieved
+    if (!user || !user._id) {
+        throw new Error('User creation failed');
     }
 
     const token = generateToken(res, user._id);
