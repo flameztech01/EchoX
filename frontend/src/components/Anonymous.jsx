@@ -6,7 +6,12 @@ import { useSelector } from 'react-redux';
 import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
 
 const Anonymous = () => {
-  const { data: anonymousPosts, isLoading, refetch } = useGetAnonymousQuery();
+  // Add pollingInterval to refetch every 2 seconds
+  const { data: anonymousPosts, isLoading, refetch } = useGetAnonymousQuery(undefined, {
+    pollingInterval: 2000, // Refetch every 2 seconds
+    refetchOnMountOrArgChange: true
+  });
+  
   const [likeAnonymous] = useLikeAnonymousMutation();
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -41,7 +46,7 @@ const Anonymous = () => {
     try {
       const result = await likeAnonymous(postId).unwrap();
       console.log('Like API response:', result);
-      refetch();
+      // Remove refetch() - polling will handle it automatically
     } catch (error) {
       console.error('Like failed:', error);
       toast.error(error.message || 'Failed to like the post.');
