@@ -106,7 +106,7 @@ form button:active {
   gap: 15px;
 }
 
-.signup_options a {
+.signup_options button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,13 +123,13 @@ form button:active {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.signup_options a:hover {
+.signup_options button:hover {
   border-color: #1EA1D9;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-.signup_options a img {
+.signup_options button img {
   width: 24px;
   height: 24px;
   margin: 0;

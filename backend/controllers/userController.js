@@ -2,7 +2,91 @@ import express from 'express';
 import User from '../models/userModel.js';
 import asyncHandler from 'express-async-handler';
 import generateToken from '../utils/generateToken.js';
+import { OAuth2Client } from 'google-auth-library';
 
+// Initialize Google OAuth client
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// Add this helper function
+const getUserInfoFromAccessToken = async (accessToken) => {
+  const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch user info from Google');
+  }
+  const userInfo = await response.json();
+  return userInfo;
+};
+
+// Update your googleAuth function
+const googleAuth = asyncHandler(async (req, res, next) => {
+    const { token: googleToken } = req.body;
+
+    if (!googleToken) {
+        res.status(400);
+        throw new Error('Google token is required');
+    }
+
+    let payload;
+    let googleId, email, name, picture;
+
+    try {
+        // Try to verify as ID token first
+        const ticket = await googleClient.verifyIdToken({
+            idToken: googleToken,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        payload = ticket.getPayload();
+        ({ sub: googleId, email, name, picture } = payload);
+    } catch (error) {
+        // If ID token verification fails, try as access token
+        try {
+            const userInfo = await getUserInfoFromAccessToken(googleToken);
+            // For access token, we don't get 'sub' but we can use email as identifier
+            googleId = userInfo.sub || `google-${userInfo.email}`;
+            email = userInfo.email;
+            name = userInfo.name;
+            picture = userInfo.picture;
+        } catch (accessError) {
+            console.log('Google auth error:', accessError);
+            res.status(400);
+            throw new Error('Invalid Google token');
+        }
+    }
+
+    // Rest of your existing code remains the same...
+    let user = await User.findOne({ 
+        $or: [
+            { googleId },
+            { email }
+        ]
+    });
+
+    if (user) {
+        if (!user.googleId) {
+            user.googleId = googleId;
+            user.isVerified = true;
+            await user.save();
+        }
+    } else {
+        // Create new user... (your existing code)
+    }
+
+    const token = generateToken(res, user._id);
+    res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        profile: user.profile,
+        authMethod: user.authMethod,
+        token,
+    });
+});
 
 //Login a new User
 const loginUser = asyncHandler(async (req, res, next) => {
@@ -148,6 +232,7 @@ const logoutUser = asyncHandler(async (req, res, next) => {
 });
 
 export {
+    googleAuth,
     loginUser,
     registerUser,
     getUserProfile,

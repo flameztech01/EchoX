@@ -5,11 +5,26 @@ import { useSelector } from 'react-redux';
 import { FaHeart, FaRegHeart, FaRegComment, FaEye, FaShare, FaBookmark, FaRegBookmark } from "react-icons/fa";
 
 const Viewposts = () => {
-  const { data: posts, isLoading, refetch } = useGetPostsQuery();
+  // Add pollingInterval to refetch every 2 seconds
+  const { data: posts, isLoading, refetch } = useGetPostsQuery(undefined, {
+    pollingInterval: 2000, // Refetch every 2 seconds
+    refetchOnMountOrArgChange: true
+  });
+  
   const [likePost] = useLikePostMutation();
   const { userInfo } = useSelector((state) => state.auth);
 
-  // Loading state
+  // Remove manual refetch from handleLike since polling handles it
+  const handleLike = async (postId) => {
+    try {
+      await likePost(postId).unwrap();
+      // Remove refetch() here - polling will handle it
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
+  };
+
+  // Rest of your code remains the same...
   if (isLoading) {
     return (
       <div className="peak">
@@ -32,15 +47,6 @@ const Viewposts = () => {
       </div>
     );
   }
-
-  const handleLike = async (postId) => {
-    try {
-      await likePost(postId).unwrap();
-      refetch();
-    } catch (error) {
-      console.error('Error liking post:', error);
-    }
-  };
 
   const isLiked = (post) => {
     return post.likedBy?.includes(userInfo?._id);

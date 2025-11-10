@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  googleAuth,
     loginUser,
     registerUser,
     getUserProfile,
@@ -35,6 +36,7 @@ cloudinary.api.ping()
   .then(result => console.log('✅ Cloudinary connected successfully'))
   .catch(err => console.error('Cloudinary not connected', err.message));
 
+router.post('/google', googleAuth);
 router.post('/login', loginUser);
 router.post('/register', registerUser);
 router.get('/profile', protect, getUserProfile);

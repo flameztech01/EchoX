@@ -2,11 +2,14 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import { useCreatePostMutation } from '../slices/postApiSlice.js';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Postform = () => {
   const [createPost, { isLoading }] = useCreatePostMutation();
   const [text, setText] = useState('');
   const [image, setImage] = useState(null);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,6 +25,7 @@ const Postform = () => {
       toast.success('Post created successfully');
       setText('');
       setImage(null);
+      navigate('/home');
     } catch (error) {
       toast.error('Error creating post');
     }

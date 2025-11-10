@@ -8,6 +8,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { Provider } from 'react-redux';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import 'react-toastify/dist/ReactToastify.css';
 
 import Welcome from './screens/Welcome.jsx';
@@ -23,7 +24,6 @@ import Privateroute from './components/Privateroute.jsx';
 import Ghostform from './screens/Ghostform.jsx';
 import ProfileIdscreen from './screens/ProfileIdscreen.jsx';
 import Editprofileform from './screens/Editprofileform.jsx';
-
 
 const router = createBrowserRouter([
   {path: '/', element: <App />, children: [
@@ -45,11 +45,12 @@ const router = createBrowserRouter([
   ]}
 ])
 
-
 createRoot(document.getElementById('root')).render(
-  <Provider store={store}>
+  <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+    <Provider store={store}>
       <StrictMode>
-          <RouterProvider router={router} />
-  </StrictMode>,
-  </Provider>
+        <RouterProvider router={router} />
+      </StrictMode>
+    </Provider>
+  </GoogleOAuthProvider>
 )
