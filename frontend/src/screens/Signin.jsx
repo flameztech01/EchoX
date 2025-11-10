@@ -58,13 +58,13 @@ const Signin = () => {
 
           <a href="">Forget Password</a>
 
-          <button type='submit'>Sign Up</button>
+          <button type='submit'>Sign In</button>
           
           <div className="signup_options">
             <a href=""><img src="/google.png" alt="" />Google</a>
             <a href=""><img src="/facebook.png" alt="" />Facebook</a>
           </div>
-          <p>Don't have an account? <span><Link to="/signup">Sign In</Link></span></p>
+          <p>Don't have an account? <span><Link to="/signup">Sign Up</Link></span></p>
       </form>
     </div>
   )

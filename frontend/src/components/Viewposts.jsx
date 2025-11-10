@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 import { useGetPostsQuery, useLikePostMutation } from '../slices/postApiSlice.js';
 import { useSelector } from 'react-redux';
+import { FaHeart, FaRegHeart, FaRegComment, FaEye, FaShare, FaBookmark, FaRegBookmark } from "react-icons/fa";
 
 const Viewposts = () => {
   const { data: posts, isLoading, refetch } = useGetPostsQuery();
@@ -62,18 +63,22 @@ const Viewposts = () => {
           <img src={post.image} alt="" className='postImg'/>
           <div className="postAction">
             <div className="likes-count">
-              <input 
-                type="checkbox" 
-                id={`heart-${post._id}`} 
-                checked={isLiked(post)}
-                onChange={() => handleLike(post._id)}
-              />
-              <label htmlFor={`heart-${post._id}`}>&#10084;</label>
+              <button 
+                className="icon-btn"
+                onClick={() => handleLike(post._id)}
+              >
+                {isLiked(post) ? (
+                  <FaHeart className="icon liked" />
+                ) : (
+                  <FaRegHeart className="icon" />
+                )}
+              </button>
               <p>{post.like || 0} Likes</p>
             </div>
             <div className="likes-count">
-              <input type="checkbox" id={`bookmark-${post._id}`} />
-              <label htmlFor={`bookmark-${post._id}`}>💬</label>
+              <Link to={`/post/${post._id}`} className="icon-btn">
+                <FaRegComment className="icon" />
+              </Link>
               <Link to={`/post/${post._id}`}>Comments</Link>
             </div>
           </div>
