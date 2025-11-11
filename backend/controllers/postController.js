@@ -5,6 +5,13 @@ import asyncHandler from 'express-async-handler';
 //Create post 
 const createPost = asyncHandler(async (req, res, next) => {
     const {text, hashtag} = req.body;
+    
+    // Check file size before processing (5MB limit)
+    if (req.file && req.file.size > 5 * 1024 * 1024) {
+        res.status(413);
+        throw new Error('File too large. Maximum size is 5MB.');
+    }
+
     const image = req.file ? req.file.path : null;
 
     const newPost = await Post.create({

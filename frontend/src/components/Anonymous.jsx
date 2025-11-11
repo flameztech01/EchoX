@@ -8,7 +8,7 @@ import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
 const Anonymous = () => {
   // Add pollingInterval to refetch every 2 seconds
   const { data: anonymousPosts, isLoading, refetch } = useGetAnonymousQuery(undefined, {
-    pollingInterval: 2000, // Refetch every 2 seconds
+    pollingInterval: 3000, // Refetch every 3 seconds
     refetchOnMountOrArgChange: true
   });
   

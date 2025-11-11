@@ -7,7 +7,7 @@ import { FaHeart, FaRegHeart, FaRegComment, FaEye, FaShare, FaBookmark, FaRegBoo
 const Viewposts = () => {
   // Add pollingInterval to refetch every 2 seconds
   const { data: posts, isLoading, refetch } = useGetPostsQuery(undefined, {
-    pollingInterval: 2000, // Refetch every 2 seconds
+    pollingInterval: 3000, // Refetch every 3 seconds
     refetchOnMountOrArgChange: true
   });
   
