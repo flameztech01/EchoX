@@ -20,6 +20,14 @@ export const userApiSlice = apiSlice.injectEndpoints({
         })
       }),
 
+      facebookAuth: builder.mutation({
+        query: (data) => ({
+          url: `${USER_URL}/facebook`,
+          method: 'POST',
+          body: data
+        })
+      }),
+
       register: builder.mutation({
         query: (data) => ({
             url: `${USER_URL}/register`,
@@ -61,6 +69,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
 
 export const {useLoginMutation, 
   useGoogleAuthMutation,
+  useFacebookAuthMutation,
     useRegisterMutation, 
     useGetUserProfileQuery, 
     useGetOneUserProfileQuery,

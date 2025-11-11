@@ -8,7 +8,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setCredentials } from '../slices/authSlice.js'
 import { useNavigate } from 'react-router-dom'
 import { useGoogleLogin } from '@react-oauth/google';
-import { useGoogleAuthMutation } from '../slices/userApiSlice.js'
+import { useGoogleAuthMutation } from '../slices/userApiSlice.js';
+
 
 const Signup = () => {
   const [registerUser, {isLoading, error}] = useRegisterMutation();

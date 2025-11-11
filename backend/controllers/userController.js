@@ -3,6 +3,7 @@ import User from '../models/userModel.js';
 import asyncHandler from 'express-async-handler';
 import generateToken from '../utils/generateToken.js';
 import { OAuth2Client } from 'google-auth-library';
+import { processFacebookAuth } from '../services/facebookAuth.js';
 
 // Initialize Google OAuth client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -116,6 +117,91 @@ const googleAuth = asyncHandler(async (req, res, next) => {
         token,
     });
 });
+
+
+
+
+
+
+
+
+
+
+// Facebook Auth function..............................................................
+//.....................................................................................................
+//FACEBOOK AUTH
+
+
+// const facebookAuth = asyncHandler(async (req, res, next) => {
+//     const { token: facebookToken } = req.body;
+
+//     if (!facebookToken) {
+//         res.status(400);
+//         throw new Error('Facebook token is required');
+//     }
+
+//     const { facebookId, email, name, picture } = await processFacebookAuth(facebookToken);
+
+//     // Check if user already exists with this email
+//     let user = await User.findOne({ email });
+
+//     console.log('Found user:', user);
+
+//     if (user) {
+//         // If user exists, add facebookId to the user object
+//         user.facebookId = facebookId;
+//         user.isVerified = true;
+//         user.authMethod = 'facebook';
+//         await user.save();
+//     } else {
+//         // Create new user
+//         const baseUsername = email.split('@')[0] || name.toLowerCase().replace(/\s+/g, '');
+//         let username = baseUsername;
+//         let counter = 1;
+
+//         // Ensure username is unique
+//         while (await User.findOne({ username })) {
+//             username = `${baseUsername}${counter}`;
+//             counter++;
+//         }
+
+//         user = await User.create({
+//             facebookId,
+//             name: name || '',
+//             username,
+//             email,
+//             profile: picture || '',
+//             password: `facebook-auth-${facebookId}`,
+//             isVerified: true,
+//             authMethod: 'facebook'
+//         });
+//         console.log('Created new user:', user);
+//     }
+
+//     const token = generateToken(res, user._id);
+//     res.status(200).json({
+//         _id: user._id,
+//         name: user.name,
+//         username: user.username,
+//         email: user.email,
+//         bio: user.bio,
+//         profile: user.profile,
+//         authMethod: user.authMethod || 'facebook',
+//         token,
+//     });
+// });
+
+
+
+
+
+
+
+
+
+
+
+
 
 //Login a new User
 const loginUser = asyncHandler(async (req, res, next) => {
