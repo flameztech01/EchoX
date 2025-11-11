@@ -115,6 +115,7 @@ const googleAuth = asyncHandler(async (req, res, next) => {
         profile: user.profile,
         authMethod: user.authMethod,
         token,
+        cookieSet: true
     });
 });
 
