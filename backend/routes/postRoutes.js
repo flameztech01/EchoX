@@ -1,19 +1,18 @@
-import express from 'express';
+import express from "express";
 import {
-    createPost,
-    getPosts,
-    getPost,
-    searchPost,
-    userPosts,
-    editPost,
-    deletePost,
-    likePost
-} from '../controllers/postController.js';
-import { protect } from '../middleware/authMiddleware.js';
-import { v2 as cloudinary } from 'cloudinary'
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import multer from 'multer';
-
+  createPost,
+  getPosts,
+  getPost,
+  searchPost,
+  userPosts,
+  editPost,
+  deletePost,
+  likePost,
+} from "../controllers/postController.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import multer from "multer";
 
 const router = express.Router();
 
@@ -37,25 +36,25 @@ const storage = new CloudinaryStorage({
       "bmp",
       "tiff",
       "heif",
-      "heic"
+      "heic",
     ],
   },
 });
 
+const upload = multer({ storage });
 
-const upload = multer({storage});
+cloudinary.api
+  .ping()
+  .then((result) => console.log("✅ Cloudinary connected successfully"))
+  .catch((err) => console.error("Cloudinary not connected", err.message));
 
-cloudinary.api.ping()
-  .then(result => console.log('✅ Cloudinary connected successfully'))
-  .catch(err => console.error('Cloudinary not connected', err.message));
-
-router.post('/upload', protect, upload.single('image'), createPost);
-router.get('/', protect, getPosts);
-router.get('/:id', protect, getPost);
-router.get('/search/:text', protect, searchPost);
-router.get('/user-post', protect, userPosts);
-router.put('/edit-post', protect, editPost);
-router.post('/delete', protect, deletePost);
-router.patch('/:id/like', protect, likePost);
+router.post("/upload", protect, upload.single("image"), createPost);
+router.get("/", protect, getPosts);
+router.get("/:id", protect, getPost);
+router.get("/search/:text", protect, searchPost);
+router.get("/user-post", protect, userPosts);
+router.put("/edit-post", protect, editPost);
+router.post("/delete", protect, deletePost);
+router.patch("/:id/like", protect, likePost);
 
 export default router;

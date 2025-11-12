@@ -33,7 +33,7 @@ const createPost = asyncHandler(async (req, res, next) => {
 
 //Get all posts
 const getPosts = asyncHandler(async (req, res, next) => {
-    const posts = await Post.find().sort({ createdAt: -1 }).populate('user', 'username profile');
+    const posts = await Post.find().sort({ createdAt: -1 }).populate('user', 'name username profile followers');
 
     if (!posts) {
         res.status(404);

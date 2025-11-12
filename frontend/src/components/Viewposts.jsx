@@ -1,30 +1,71 @@
-import React from 'react'
-import { Link } from 'react-router-dom';
-import { useGetPostsQuery, useLikePostMutation } from '../slices/postApiSlice.js';
-import { useSelector } from 'react-redux';
-import { FaHeart, FaRegHeart, FaRegComment, FaEye, FaShare, FaBookmark, FaRegBookmark } from "react-icons/fa";
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  useGetPostsQuery,
+  useLikePostMutation,
+} from "../slices/postApiSlice.js";
+import { useFollowUserMutation, useUnfollowUserMutation } from "../slices/userApiSlice.js";
+import { useSelector } from "react-redux";
+import {
+  FaHeart,
+  FaRegHeart,
+  FaRegComment,
+} from "react-icons/fa";
 
 const Viewposts = () => {
-  // Add pollingInterval to refetch every 2 seconds
-  const { data: posts, isLoading, refetch } = useGetPostsQuery(undefined, {
-    pollingInterval: 3000, // Refetch every 3 seconds
-    refetchOnMountOrArgChange: true
+  const {
+    data: posts,
+    isLoading,
+    refetch: refetchPosts,
+  } = useGetPostsQuery(undefined, {
+    pollingInterval: 3000,
+    refetchOnMountOrArgChange: true,
   });
-  
+
   const [likePost] = useLikePostMutation();
+  const [followUser] = useFollowUserMutation();
+  const [unfollowUser] = useUnfollowUserMutation();
+  
   const { userInfo } = useSelector((state) => state.auth);
 
-  // Remove manual refetch from handleLike since polling handles it
   const handleLike = async (postId) => {
     try {
       await likePost(postId).unwrap();
-      // Remove refetch() here - polling will handle it
     } catch (error) {
-      console.error('Error liking post:', error);
+      console.error("Error liking post:", error);
     }
   };
 
-  // Rest of your code remains the same...
+  const handleFollow = async (userId) => {
+    try {
+      await followUser(userId).unwrap();
+      refetchPosts(); // Refresh posts to update follow status
+    } catch (error) {
+      console.error("Error following user:", error);
+    }
+  };
+
+  const handleUnfollow = async (userId) => {
+    try {
+      await unfollowUser(userId).unwrap();
+      refetchPosts(); // Refresh posts to update follow status
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+    }
+  };
+
+  const isLiked = (post) => {
+    return post.likedBy?.includes(userInfo?._id);
+  };
+
+  const isOwnPost = (post) => {
+    return post.user?._id === userInfo?._id;
+  };
+
+  const isFollowing = (post) => {
+    return post.user?.followers?.includes(userInfo?._id);
+  };
+
   if (isLoading) {
     return (
       <div className="peak">
@@ -48,31 +89,42 @@ const Viewposts = () => {
     );
   }
 
-  const isLiked = (post) => {
-    return post.likedBy?.includes(userInfo?._id);
-  };
-
   return (
-    <div className='peak'>
+    <div className="peak">
       {posts?.map((post) => (
-        <div className='high' key={post._id}>
+        <div className="high" key={post._id}>
           <div className="profileSide">
             <div className="postProfile">
               <img src={post?.user?.profile || `/default-avatar.jpg`} alt="" />
-              <Link to={`/profile/${post.user?._id}`}>{post?.user?.username}</Link>
+              <Link to={`/profile/${post.user?._id}`}>
+                {post?.user?.username}
+              </Link>
             </div>
             <div className="postFoll">
-              <button type='follow'>Follow</button>
+              {!isOwnPost(post) && userInfo && (
+                isFollowing(post) ? (
+                  <button 
+                    type="button" 
+                    onClick={() => handleUnfollow(post.user?._id)}
+                  >
+                    Unfollow
+                  </button>
+                ) : (
+                  <button 
+                    type="button" 
+                    onClick={() => handleFollow(post.user?._id)}
+                  >
+                    Follow
+                  </button>
+                )
+              )}
             </div>
           </div>
           <h2>{post.text}</h2>
-          <img src={post.image} alt="" className='postImg'/>
+          <img src={post.image} alt="" className="postImg" />
           <div className="postAction">
             <div className="likes-count">
-              <button 
-                className="icon-btn"
-                onClick={() => handleLike(post._id)}
-              >
+              <button className="icon-btn" onClick={() => handleLike(post._id)}>
                 {isLiked(post) ? (
                   <FaHeart className="icon liked" />
                 ) : (
@@ -91,7 +143,7 @@ const Viewposts = () => {
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default Viewposts
+export default Viewposts;

@@ -1,17 +1,22 @@
-import express from 'express';
+import express from "express";
 import {
   googleAuth,
-    loginUser,
-    registerUser,
-    getUserProfile,
-    getAnyUserProfile,
-    updateProfile,
-    logoutUser
-} from '../controllers/userController.js';
-import {protect} from '../middleware/authMiddleware.js';
-import multer from 'multer';
-import {CloudinaryStorage} from 'multer-storage-cloudinary';
-import {v2 as cloudinary} from 'cloudinary';
+  loginUser,
+  registerUser,
+  getUserProfile,
+  getAnyUserProfile,
+  updateProfile,
+  logoutUser,
+  followUser,
+  unfollowUser,
+  getFollowers,
+  getFollowing,
+  getFollowStats,
+} from "../controllers/userController.js";
+import { protect } from "../middleware/authMiddleware.js";
+import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 
 const router = express.Router();
 
@@ -35,23 +40,40 @@ const storage = new CloudinaryStorage({
       "bmp",
       "tiff",
       "heif",
-      "heic"
+      "heic",
     ],
   },
 });
 
-const upload = multer({storage});
+const upload = multer({ storage });
 
-cloudinary.api.ping()
-  .then(result => console.log('✅ Cloudinary connected successfully'))
-  .catch(err => console.error('Cloudinary not connected', err.message));
+cloudinary.api
+  .ping()
+  .then((result) => console.log("✅ Cloudinary connected successfully"))
+  .catch((err) => console.error("Cloudinary not connected", err.message));
 
-router.post('/google', googleAuth);
-router.post('/login', loginUser);
-router.post('/register', registerUser);
-router.get('/profile', protect, getUserProfile);
-router.get('/profile/:id', protect, getAnyUserProfile);
-router.put('/update-profile', protect, upload.single('image'), updateProfile);
-router.post('/logout', logoutUser);
+router.post("/google", googleAuth);
+router.post("/login", loginUser);
+router.post("/register", registerUser);
+router.get("/profile", protect, getUserProfile);
+router.get("/profile/:id", protect, getAnyUserProfile);
+router.put("/update-profile", protect, upload.single("image"), updateProfile);
+router.post("/logout", logoutUser);
+
+router.post("/follow/:id", protect, followUser);
+router.post("/unfollow/:id", protect, unfollowUser);
+
+// Followers
+router.get("/followers", protect, getFollowers); // current user
+router.get("/followers/:id", protect, getFollowers); // specific user
+
+// Following
+router.get("/following", protect, getFollowing); // current user
+router.get("/following/:id", protect, getFollowing); // specific user
+
+// Follow stats
+router.get("/follow-stats", protect, getFollowStats); // current user
+router.get("/follow-stats/:id", protect, getFollowStats); // specific user
+// :id is optional, defaults to current user
 
 export default router;
