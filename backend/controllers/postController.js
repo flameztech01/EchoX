@@ -46,7 +46,7 @@ const getPosts = asyncHandler(async (req, res, next) => {
 //Get single post
 const getPost = asyncHandler(async (req, res, next) => {
           const id = req.params.id;
-            const post = await Post.findById(id).populate('user', 'username profile');
+            const post = await Post.findById(id).populate('user', 'name username profile followers');
 
             if(!post) {
                 res.status(404);

@@ -5,25 +5,56 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
+import { useFollowUserMutation, useUnfollowUserMutation } from '../slices/userApiSlice.js';
 
 const Postid = () => {
   const { id } = useParams();
   const { data: post, isLoading, refetch } = useGetOnePostQuery(id);
   const [likePost] = useLikePostMutation();
+  const [followUser] = useFollowUserMutation();
+  const [unfollowUser] = useUnfollowUserMutation();
   const { userInfo } = useSelector((state) => state.auth);
 
   const handleLike = async (postId) => {
     try {
       await likePost(postId).unwrap();
-      await refetch(); // Refresh to get updated like status from server
+      await refetch();
     } catch (error) {
       console.error('Like failed:', error);
       toast.error(error.message || 'Failed to like the post.');
     }
   };
 
+  const handleFollow = async (userId) => {
+    try {
+      await followUser(userId).unwrap();
+      await refetch(); // Refresh to get updated follow status
+    } catch (error) {
+      console.error('Follow failed:', error);
+      toast.error(error.message || 'Failed to follow user.');
+    }
+  };
+
+  const handleUnfollow = async (userId) => {
+    try {
+      await unfollowUser(userId).unwrap();
+      await refetch(); // Refresh to get updated follow status
+    } catch (error) {
+      console.error('Unfollow failed:', error);
+      toast.error(error.message || 'Failed to unfollow user.');
+    }
+  };
+
   const isLiked = (post) => {
     return post.likedBy?.includes(userInfo?._id);
+  };
+
+  const isOwnPost = (post) => {
+    return post.user?._id === userInfo?._id;
+  };
+
+  const isFollowing = (post) => {
+    return post.user?.followers?.includes(userInfo?._id);
   };
 
   // Loading state
@@ -59,7 +90,23 @@ const Postid = () => {
               <Link to={`/profile/${post.user?._id}`}>{post?.user?.username}</Link>
             </div>
             <div className="postFoll">
-              <button type='follow'>Follow</button>
+              {!isOwnPost(post) && userInfo && (
+                isFollowing(post) ? (
+                  <button 
+                    type="button" 
+                    onClick={() => handleUnfollow(post.user?._id)}
+                  >
+                    Unfollow
+                  </button>
+                ) : (
+                  <button 
+                    type="button" 
+                    onClick={() => handleFollow(post.user?._id)}
+                  >
+                    Follow
+                  </button>
+                )
+              )}
             </div>
           </div>
           <h2>{post.text}</h2>

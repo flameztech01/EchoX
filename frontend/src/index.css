@@ -447,6 +447,20 @@ button[type="submit"]:disabled {
   transition: color 0.3s ease;
 }
 
+.navbar .logo a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar .logo a:hover {
+  color: #666;
+}
+
 /* Viewposts.............................................
 ........................................................................
 ..................................................................... */

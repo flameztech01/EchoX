@@ -31,7 +31,7 @@ const getGhostComments = asyncHandler(async (req, res) => {
     }
     
     const comments = await Comment.find({ post: postId })
-        .populate('author', 'name username profile')
+        .populate('author', 'name username profile followers')
         .sort({ createdAt: -1 });
     
     res.status(200).json(comments);

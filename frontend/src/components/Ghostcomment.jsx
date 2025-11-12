@@ -1,6 +1,7 @@
 import React from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useGetCommentsQuery, useLikeCommentMutation } from '../slices/commentApiSlice.js';
+import { useFollowUserMutation, useUnfollowUserMutation } from '../slices/userApiSlice.js';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify'
 import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
@@ -8,26 +9,53 @@ import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
 const Ghostcomment = () => {
     const {id} = useParams();
     const {data: comments} = useGetCommentsQuery(id, {
-       pollingInterval: 1000, // Refetch every 1 second
+       pollingInterval: 1000,
       refetchOnFocus: true,
       refetchOnReconnect: true
     });
     
     const [likeAnonymous] = useLikeCommentMutation();
+    const [followUser] = useFollowUserMutation();
+    const [unfollowUser] = useUnfollowUserMutation();
     const {userInfo} = useSelector((state) => state.auth);
 
     const handleLike = async (commentId) => {
         try {
             await likeAnonymous(commentId).unwrap();
-            // Polling will automatically update the UI
         } catch (error) {
             console.error('Like failed:', error);
             toast.error(error.message || 'Failed to like the comment.');
         }
     };
 
+    const handleFollow = async (userId) => {
+        try {
+            await followUser(userId).unwrap();
+        } catch (error) {
+            console.error('Follow failed:', error);
+            toast.error(error.message || 'Failed to follow user.');
+        }
+    };
+
+    const handleUnfollow = async (userId) => {
+        try {
+            await unfollowUser(userId).unwrap();
+        } catch (error) {
+            console.error('Unfollow failed:', error);
+            toast.error(error.message || 'Failed to unfollow user.');
+        }
+    };
+
     const isLiked = (comment) => {
         return comment.likedBy?.includes(userInfo?._id);
+    };
+
+    const isOwnComment = (comment) => {
+        return comment.author?._id === userInfo?._id;
+    };
+
+    const isFollowing = (comment) => {
+        return comment.author?.followers?.includes(userInfo?._id);
     };
 
     return (
@@ -39,7 +67,23 @@ const Ghostcomment = () => {
                     <img src={comment.author.profile || "/default-avatar.jpg"} alt="" />
                     <Link to={`/profile/${comment.author._id}`} className="comment-username">{comment.author.username}</Link>
                 </div>
-                <button className="follow-btn">Follow</button>
+                {!isOwnComment(comment) && userInfo && (
+                    isFollowing(comment) ? (
+                        <button 
+                            className="follow-btn"
+                            onClick={() => handleUnfollow(comment.author._id)}
+                        >
+                            Unfollow
+                        </button>
+                    ) : (
+                        <button 
+                            className="follow-btn"
+                            onClick={() => handleFollow(comment.author._id)}
+                        >
+                            Follow
+                        </button>
+                    )
+                )}
             </div>
             <p className="comment-text">{comment.text}</p>
             <div className="comment-actions">
