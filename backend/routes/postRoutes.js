@@ -28,9 +28,20 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "EchoX_posts",
-    allowed_formats: ["jpg", "png", "jpeg"],
+    allowed_formats: [
+      "jpg",
+      "jpeg",
+      "png",
+      "webp",
+      "gif",
+      "bmp",
+      "tiff",
+      "heif",
+      "heic"
+    ],
   },
 });
+
 
 const upload = multer({storage});
 
