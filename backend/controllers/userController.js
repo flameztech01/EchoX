@@ -192,14 +192,19 @@ const loginUser = asyncHandler(async (req, res, next) => {
   console.log("User found:", user);
 
   if (user && (await user.matchPassword(password))) {
+    const userWithFollows = await User.findById(user._id)
+      .select("-password")
+      .populate("following", "_id");
+      
     const token = generateToken(res, user._id);
     res.status(200).json({
-      _id: user._id,
-      name: user.name,
-      username: user.username,
-      email: user.email,
-      bio: user.bio,
-      profile: user.profile,
+      _id: userWithFollows._id,
+      name: userWithFollows.name,
+      username: userWithFollows.username,
+      email: userWithFollows.email,
+      bio: userWithFollows.bio,
+      profile: userWithFollows.profile,
+      following: userWithFollows.following,
       token,
     });
   } else {
@@ -230,13 +235,18 @@ const registerUser = asyncHandler(async (req, res, next) => {
   });
 
   if (user) {
+    const userWithFollows = await User.findById(user._id)
+      .select("-password")
+      .populate("following", "_id");
+      
     const token = generateToken(res, user._id);
     res.status(201).json({
-      id: user._id,
-      name: user.name,
-      username: user.username,
-      email: user.email,
-      token, // Remove password from response!
+      id: userWithFollows._id,
+      name: userWithFollows.name,
+      username: userWithFollows.username,
+      email: userWithFollows.email,
+      following: userWithFollows.following,
+      token,
     });
   } else {
     res.status(400);
@@ -366,9 +376,13 @@ const followUser = asyncHandler(async (req, res, next) => {
     .populate("followers", "_id")
     .populate("following", "_id");
 
+  const updatedCurrentUser = await User.findById(currentUserId)
+    .select("-password")
+    .populate("following", "_id");
+
   res.status(200).json({
     message: `You don follow ${userToFollow.username}`,
-    user: updatedUser, // Return the updated user data
+    user: updatedCurrentUser, // Return CURRENT user, not target user
   });
 });
 
@@ -407,9 +421,13 @@ const unfollowUser = asyncHandler(async (req, res, next) => {
     .populate("followers", "_id")
     .populate("following", "_id");
 
+  const updatedCurrentUser = await User.findById(currentUserId)
+    .select("-password")
+    .populate("following", "_id");
+
   res.status(200).json({
     message: `You don unfollow ${userToUnfollow.username}`,
-    user: updatedUser, // Return the updated user data
+    user: updatedCurrentUser, // Return CURRENT user, not target user
   });
 });
 

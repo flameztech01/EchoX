@@ -24,6 +24,7 @@ import Privateroute from './components/Privateroute.jsx';
 import Ghostform from './screens/Ghostform.jsx';
 import ProfileIdscreen from './screens/ProfileIdscreen.jsx';
 import Editprofileform from './screens/Editprofileform.jsx';
+import FollowersScreen from './screens/FollowersScreen.jsx';
 
 const router = createBrowserRouter([
   {path: '/', element: <App />, children: [
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
     {path: 'ghostform', element: <Ghostform />},
     {path: '/profile/:id', element: <ProfileIdscreen />},
     {path: 'edit-profile', element: <Editprofileform />},
+    {path: '/followers', element: <FollowersScreen />},
     ]},
   ]}
 ])

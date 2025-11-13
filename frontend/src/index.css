@@ -1942,3 +1942,229 @@ button:disabled {
 .liked {
   color: #1EA1D9;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/* Followers Screen */
+.followers-screen {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 20px;
+  padding-top: 80px;
+}
+
+.followers-header {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.followers-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.followers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.follower-card {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+.follower-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+}
+
+.follower-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.follower-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.follower-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 3px solid #E0E0E0;
+  border-radius: 50%;
+  transition: border-color 0.3s ease;
+}
+
+.follower-avatar:hover img {
+  border-color: #1EA1D9;
+}
+
+.follower-details {
+  flex: 1;
+}
+
+.follower-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.follower-name:hover {
+  color: #1EA1D9;
+}
+
+.follower-username {
+  color: #666;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+}
+
+.friends-badge {
+  background: linear-gradient(135deg, #1EA1D9, #8B33BB);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.follower-actions {
+  flex-shrink: 0;
+}
+
+.follow-btn, .unfollow-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.follow-btn {
+  background: linear-gradient(135deg, #1EA1D9, #8B33BB);
+  color: white;
+}
+
+.follow-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 161, 217, 0.3);
+}
+
+.unfollow-btn {
+  background: #E0E0E0;
+  color: #666;
+}
+
+.unfollow-btn:hover {
+  background: #ff4444;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Loading Skeletons */
+.follower-card.loading-skeleton {
+  pointer-events: none;
+}
+
+.follower-card.loading-skeleton .follower-info {
+  gap: 15px;
+}
+
+.follower-card.loading-skeleton .skeleton-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+.follower-card.loading-skeleton .skeleton-text {
+  width: 120px;
+  height: 16px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Responsive */
+@media (max-width: 780px) {
+  .followers-screen {
+    padding: 15px;
+    padding-top: 70px;
+  }
+  
+  .follower-card {
+    padding: 15px;
+  }
+  
+  .follower-avatar {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .follower-name {
+    font-size: 15px;
+  }
+  
+  .follower-username {
+    font-size: 13px;
+  }
+  
+  .follow-btn, .unfollow-btn {
+    padding: 6px 16px;
+    font-size: 13px;
+  }
+}
