@@ -1,8 +1,13 @@
 {
   "name": "EchoX",
   "short_name": "EchoX",
+  "description": "EchoX helps users express themselves freely, connect with others, and share anonymous posts in a safe, interactive community.",
+  "dir": "ltr",
+  "lang": "en",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay"],
+  "orientation": "portrait",
   "theme_color": "#1EA1D9",
   "background_color": "#E8E8E8",
   "icons": [
@@ -10,6 +15,21 @@
       "src": "/logo.png",
       "sizes": "192x192",
       "type": "image/png"
+    },
+    {
+      "src": "/google.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/screen1.png",
+      "sizes": "720x1280",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["social", "communication"],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
