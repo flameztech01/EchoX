@@ -1736,12 +1736,7 @@ button[type="submit"]:disabled {
     top: 80px;
     padding: 0 15px 15px 15px;
   }
-  
-  .container img {
-    width: 100px;
-    height: 100px;
-  }
-  
+
   .profileContent h1 {
     font-size: 20px;
   }
@@ -1776,11 +1771,6 @@ button[type="submit"]:disabled {
     padding: 0 12px 12px 12px;
   }
   
-  .container img {
-    width: 90px;
-    height: 90px;
-  }
-  
   .profileContent h1 {
     font-size: 18px;
   }
@@ -1807,7 +1797,7 @@ button[type="submit"]:disabled {
 @media (max-width: 320px) {
   /* iPhone SE, 5 */
   .container {
-    height: 50vh;
+    height: 65vh;
     padding: 10px;
   }
   
@@ -1820,11 +1810,7 @@ button[type="submit"]:disabled {
     padding: 0 10px 10px 10px;
   }
   
-  .container img {
-    width: 80px;
-    height: 80px;
-    border-width: 3px;
-  }
+
   
   .profileContent h1 {
     font-size: 16px;
@@ -1854,6 +1840,8 @@ button[type="submit"]:disabled {
     font-size: 11px;
   }
 }
+
+
 
 
 

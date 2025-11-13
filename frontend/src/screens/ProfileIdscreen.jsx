@@ -3,7 +3,7 @@ import PictureSide from '../components/PictureSide.jsx'
 
 const ProfileIdscreen = () => {
   return (
-    <div>
+    <div className='profile-layout'>
       <PictureSide />
     </div>
   )
