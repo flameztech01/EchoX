@@ -15,13 +15,13 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/echox';
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+    ? ['https://echox-wzh0.onrender.com']
+    : ['http://localhost:3000', 'https://echox-wzh0.onrender.com'];
 
 // Middleware
 app.use(cors({
-    origin: [
-        'http://localhost:3000',
-        'https://echox-wzh0.onrender.com',
-    ],
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
