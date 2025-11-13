@@ -25,6 +25,7 @@ const Viewposts = () => {
   const [likePost] = useLikePostMutation();
   const [followUser] = useFollowUserMutation();
   const [unfollowUser] = useUnfollowUserMutation();
+  const [expandedImages, setExpandedImages] = React.useState({});
   
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -39,7 +40,7 @@ const Viewposts = () => {
   const handleFollow = async (userId) => {
     try {
       await followUser(userId).unwrap();
-      refetchPosts(); // Refresh posts to update follow status
+      refetchPosts();
     } catch (error) {
       console.error("Error following user:", error);
     }
@@ -48,10 +49,17 @@ const Viewposts = () => {
   const handleUnfollow = async (userId) => {
     try {
       await unfollowUser(userId).unwrap();
-      refetchPosts(); // Refresh posts to update follow status
+      refetchPosts();
     } catch (error) {
       console.error("Error unfollowing user:", error);
     }
+  };
+
+  const toggleImageExpand = (postId) => {
+    setExpandedImages(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
   };
 
   const isLiked = (post) => {
@@ -121,7 +129,12 @@ const Viewposts = () => {
             </div>
           </div>
           <h2>{post.text}</h2>
-          <img src={post.image} alt="" className="postImg" />
+          <img 
+            src={post.image} 
+            alt="" 
+            className={`postImg ${expandedImages[post._id] ? 'expanded' : ''}`}
+            onClick={() => toggleImageExpand(post._id)}
+          />
           <div className="postAction">
             <div className="likes-count">
               <button className="icon-btn" onClick={() => handleLike(post._id)}>

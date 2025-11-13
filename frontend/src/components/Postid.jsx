@@ -1,11 +1,17 @@
-import React from 'react'
-import { useGetOnePostQuery, useLikePostMutation } from '../slices/postApiSlice.js';
-import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
+import React from "react";
+import {
+  useGetOnePostQuery,
+  useLikePostMutation,
+} from "../slices/postApiSlice.js";
+import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
-import { useFollowUserMutation, useUnfollowUserMutation } from '../slices/userApiSlice.js';
+import {
+  useFollowUserMutation,
+  useUnfollowUserMutation,
+} from "../slices/userApiSlice.js";
 
 const Postid = () => {
   const { id } = useParams();
@@ -13,6 +19,7 @@ const Postid = () => {
   const [likePost] = useLikePostMutation();
   const [followUser] = useFollowUserMutation();
   const [unfollowUser] = useUnfollowUserMutation();
+  const [expandedImages, setExpandedImages] = React.useState({});
   const { userInfo } = useSelector((state) => state.auth);
 
   const handleLike = async (postId) => {
@@ -20,29 +27,36 @@ const Postid = () => {
       await likePost(postId).unwrap();
       await refetch();
     } catch (error) {
-      console.error('Like failed:', error);
-      toast.error(error.message || 'Failed to like the post.');
+      console.error("Like failed:", error);
+      toast.error(error.message || "Failed to like the post.");
     }
   };
 
   const handleFollow = async (userId) => {
     try {
       await followUser(userId).unwrap();
-      await refetch(); // Refresh to get updated follow status
+      await refetch();
     } catch (error) {
-      console.error('Follow failed:', error);
-      toast.error(error.message || 'Failed to follow user.');
+      console.error("Follow failed:", error);
+      toast.error(error.message || "Failed to follow user.");
     }
   };
 
   const handleUnfollow = async (userId) => {
     try {
       await unfollowUser(userId).unwrap();
-      await refetch(); // Refresh to get updated follow status
+      await refetch();
     } catch (error) {
-      console.error('Unfollow failed:', error);
-      toast.error(error.message || 'Failed to unfollow user.');
+      console.error("Unfollow failed:", error);
+      toast.error(error.message || "Failed to unfollow user.");
     }
+  };
+
+  const toggleImageExpand = (postId) => {
+    setExpandedImages((prev) => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
   };
 
   const isLiked = (post) => {
@@ -57,7 +71,6 @@ const Postid = () => {
     return post.user?.followers?.includes(userInfo?._id);
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="peak">
@@ -67,7 +80,7 @@ const Postid = () => {
               <div className="skeleton-avatar"></div>
               <div className="skeleton-text"></div>
             </div>
-            <div className="skeleton-button" style={{width: '80px'}}></div>
+            <div className="skeleton-button" style={{ width: "80px" }}></div>
           </div>
           <div className="skeleton-line"></div>
           <div className="skeleton-image"></div>
@@ -81,42 +94,46 @@ const Postid = () => {
   }
 
   return (
-    <div className='peak'>
+    <div className="peak">
       {post && (
-        <div className='high' key={post._id}>
+        <div className="high" key={post._id}>
           <div className="profileSide">
             <div className="postProfile">
               <img src={post?.user?.profile || `/default-avatar.jpg`} alt="" />
-              <Link to={`/profile/${post.user?._id}`}>{post?.user?.username}</Link>
+              <Link to={`/profile/${post.user?._id}`}>
+                {post?.user?.username}
+              </Link>
             </div>
             <div className="postFoll">
-              {!isOwnPost(post) && userInfo && (
-                isFollowing(post) ? (
-                  <button 
-                    type="button" 
+              {!isOwnPost(post) &&
+                userInfo &&
+                (isFollowing(post) ? (
+                  <button
+                    type="button"
                     onClick={() => handleUnfollow(post.user?._id)}
                   >
                     Unfollow
                   </button>
                 ) : (
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => handleFollow(post.user?._id)}
                   >
                     Follow
                   </button>
-                )
-              )}
+                ))}
             </div>
           </div>
           <h2>{post.text}</h2>
-          <img src={post.image} alt="" className='postImg'/>
+          <img
+            src={post.image}
+            alt=""
+            className={`postImg ${expandedImages[post._id] ? "expanded" : ""}`}
+            onClick={() => toggleImageExpand(post._id)}
+          />
           <div className="postAction">
             <div className="likes-count">
-              <button 
-                className="icon-btn"
-                onClick={() => handleLike(post._id)}
-              >
+              <button className="icon-btn" onClick={() => handleLike(post._id)}>
                 {isLiked(post) ? (
                   <FaHeart className="icon liked" />
                 ) : (
@@ -135,7 +152,7 @@ const Postid = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Postid
+export default Postid;
