@@ -3,7 +3,13 @@
   "short_name": "App",
   "start_url": "/",
   "display": "standalone",
- "theme_color": "#1EA1D9",
+  "theme_color": "#1EA1D9",
   "background_color": "#E8E8E8",
-  "icons": []
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
 }
