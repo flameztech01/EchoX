@@ -1763,7 +1763,7 @@ button[type="submit"]:disabled {
 @media (max-width: 375px) {
   /* iPhone 6/7/8, X, 11 Pro, 12/13 mini */
   .container {
-    height: 55vh;
+    height: 70vh;
     padding: 12px;
   }
   
