@@ -1,6 +1,6 @@
 {
   "name": "EchoX",
-  "short_name": "App",
+  "short_name": "EchoX",
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#1EA1D9",
