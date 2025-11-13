@@ -3,7 +3,29 @@
   margin: 0px;
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
+  touch-action: manipulation;
 }
+
+/* Prevent zoom on input focus for iOS */
+input, textarea, select {
+  font-size: 16px; /* Prevents iOS zoom */
+  transform: scale(1);
+  max-height: 100vh;
+}
+
+/* Specifically for form elements */
+form input, form textarea {
+  font-size: 16px;
+  transform: translateZ(0);
+}
+
+/* Ensure no zoom on focus */
+@media screen and (max-width: 780px) {
+  input:focus, textarea:focus {
+    font-size: 16px !important;
+  }
+}
+
 
 
 
@@ -1375,10 +1397,6 @@ button[type="submit"]:disabled {
 .......................................................................
 ............................................................................*/
 
-.postghost {
-    
-}
-
 .postghost a {
   padding: 10px;
   background: linear-gradient(135deg, #1EA1D9 0%, #8B33BB 100%);
@@ -1701,6 +1719,140 @@ button[type="submit"]:disabled {
   font-size: 14px;
   margin: 5px 0 0 0;
   color: #666;
+}
+
+@media (max-width: 414px) {
+  /* iPhone 11 Pro, XR, 6/7/8 Plus */
+  .container {
+    height: 60vh;
+    padding: 15px;
+  }
+  
+  .coverPhoto {
+    height: 100px;
+  }
+  
+  .profileContent {
+    top: 80px;
+    padding: 0 15px 15px 15px;
+  }
+  
+  .container img {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .profileContent h1 {
+    font-size: 20px;
+  }
+  
+  .followPerson button {
+    padding: 8px 25px;
+    font-size: 14px;
+  }
+  
+  .followersNumber {
+    gap: 20px;
+  }
+  
+  .follows h1 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 375px) {
+  /* iPhone 6/7/8, X, 11 Pro, 12/13 mini */
+  .container {
+    height: 55vh;
+    padding: 12px;
+  }
+  
+  .coverPhoto {
+    height: 90px;
+  }
+  
+  .profileContent {
+    top: 70px;
+    padding: 0 12px 12px 12px;
+  }
+  
+  .container img {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .profileContent h1 {
+    font-size: 18px;
+  }
+  
+  .followPerson button {
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+  
+  .followersNumber {
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  .follows h1 {
+    font-size: 16px;
+  }
+  
+  .follows p {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 320px) {
+  /* iPhone SE, 5 */
+  .container {
+    height: 50vh;
+    padding: 10px;
+  }
+  
+  .coverPhoto {
+    height: 80px;
+  }
+  
+  .profileContent {
+    top: 60px;
+    padding: 0 10px 10px 10px;
+  }
+  
+  .container img {
+    width: 80px;
+    height: 80px;
+    border-width: 3px;
+  }
+  
+  .profileContent h1 {
+    font-size: 16px;
+  }
+  
+  .profileContent p {
+    font-size: 13px;
+  }
+  
+  .followPerson button {
+    padding: 6px 18px;
+    font-size: 12px;
+    margin: 10px 0;
+  }
+  
+  .followersNumber {
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 15px;
+  }
+  
+  .follows h1 {
+    font-size: 14px;
+  }
+  
+  .follows p {
+    font-size: 11px;
+  }
 }
 
 
