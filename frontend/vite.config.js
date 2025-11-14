@@ -1,20 +1,20 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { VitePWA } from "vite-plugin-pwa";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   plugins: [
     react(),
-    VitePWA({
-      registerType: "autoUpdate",
+    VitePWA({ 
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
       },
       manifest: {
         name: "EchoX",
         short_name: "EchoX",
-        description:
-          "EchoX helps users express themselves freely, connect with others, and share anonymous posts in a safe, interactive community.",
+        description: "EchoX helps users express themselves freely, connect with others, and share anonymous posts in a safe, interactive community.",
         start_url: "/",
         display: "standalone",
         theme_color: "#1EA1D9",
@@ -23,33 +23,24 @@ export default defineConfig({
           {
             src: "/logo.png",
             sizes: "192x192",
-            type: "image/png",
+            type: "image/png"
           },
           {
-            src: "/logo.png",
+            src: "/logo.png", 
             sizes: "512x512",
-            type: "image/png",
-          },
-        ],
-      },
-      // ADD THIS to ensure manifest is properly injected
-      injectRegister: "auto",
-    }),
+            type: "image/png"
+          }
+        ]
+      }
+    })
   ],
   server: {
     port: 3000,
     proxy: {
-      "/api": {
-        target: "http://localhost:5000",
+      '/api' : {
+        target: 'http://localhost:5000',
         changeOrigin: true,
-      },
-    },
-  },
-  // ADD THIS to handle static assets properly
-  build: {
-    manifest: true,
-    rollupOptions: {
-      input: "./index.html",
-    },
-  },
-});
+      }
+    }
+  }
+})
