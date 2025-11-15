@@ -30,6 +30,7 @@ import FollowersScreen from './screens/FollowersScreen.jsx';
 import FollowingScreen from './screens/FollowingScreen.jsx';
 import ChangePassword from './screens/ChangePassword.jsx';
 import DeleteAccount from './screens/DeleteAccount.jsx';
+import SettingsScreen from './screens/SettingsScreen.jsx';
 
 import Notfoundscreen from './screens/Notfoundscreen.jsx';
 
@@ -55,6 +56,7 @@ const router = createBrowserRouter(
         <Route path='following' element={<FollowingScreen />} />
         <Route path='change-password' element={<ChangePassword />} />
         <Route path='delete-account' element={<DeleteAccount />} />
+        <Route path='settings' element={<SettingsScreen />}  />
       </Route>
       
       {/* Add explicit 404 route that doesn't interfere with static files */}

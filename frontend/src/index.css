@@ -1,3 +1,37 @@
+/* CSS Variables for Light/Dark Mode */
+:root {
+  /* Light theme colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #E8E8E8;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #888888;
+  --border-color: #E0E0E0;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --hover-color: #f5f5f5;
+  --skeleton-bg: #f0f0f0;
+}
+
+[data-theme="dark"] {
+  /* Dark theme colors */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #3a3a3a;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #888888;
+  --border-color: #404040;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --card-bg: #2d2d2d;
+  --input-bg: #3a3a3a;
+  --hover-color: #404040;
+  --skeleton-bg: #3a3a3a;
+}
+
+/* Base Styles */
 * {
   padding: 0px;
   margin: 0px;
@@ -6,28 +40,54 @@
   touch-action: manipulation;
 }
 
+body {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 /* Prevent zoom on input focus for iOS */
 input, textarea, select {
-  font-size: 16px; /* Prevents iOS zoom */
+  font-size: 16px;
   transform: scale(1);
   max-height: 100vh;
 }
 
-/* Specifically for form elements */
 form input, form textarea {
   font-size: 16px;
   transform: translateZ(0);
 }
 
-/* Ensure no zoom on focus */
 @media screen and (max-width: 780px) {
   input:focus, textarea:focus {
     font-size: 16px !important;
   }
 }
 
+/* Theme Toggle */
+.theme-toggle {
+  background: linear-gradient(135deg, #1EA1D9, #8B33BB);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(30, 161, 217, 0.3);
+}
 
+.theme-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 161, 217, 0.4);
+}
 
+.theme-icon {
+  font-size: 1.2rem;
+}
 
 /* Welcome Video */
 .background-video {
@@ -47,7 +107,7 @@ form input, form textarea {
 
 /* Signup Form */
 .back {
-  background-color: #E8E8E8;
+  background-color: var(--bg-tertiary);
   padding: 40px;
   min-height: 100vh;
   display: flex;
@@ -60,8 +120,8 @@ form {
   max-width: 450px;
   margin: auto;
   padding: 40px 30px;
-  background-color: #E8E8E8;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background-color: var(--bg-tertiary);
+  box-shadow: 0 8px 24px var(--shadow-color);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -78,18 +138,19 @@ form img {
 
 form input {
   padding: 16px 20px;
-  background-color: white;
-  border: 2px solid #E0E0E0;
+  background-color: var(--input-bg);
+  border: 2px solid var(--border-color);
   border-radius: 12px;
   font-size: 16px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  color: var(--text-primary);
 }
 
 form input:focus {
   border-color: #1EA1D9;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(30, 161, 217, 0.2), 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 0 3px rgba(30, 161, 217, 0.2), 0 2px 8px var(--shadow-color);
   transform: translateY(-2px);
 }
 
@@ -134,21 +195,21 @@ form button:active {
   justify-content: center;
   gap: 8px;
   padding: 12px 20px;
-  background: white;
-  border: 2px solid #E0E0E0;
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
   border-radius: 12px;
-  color: #333;
+  color: var(--text-primary);
   text-decoration: none;
   font-weight: 500;
   transition: all 0.3s ease;
   flex: 1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px var(--shadow-color);
 }
 
 .signup_options button:hover {
   border-color: #1EA1D9;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .signup_options button img {
@@ -158,7 +219,6 @@ form button:active {
   border-radius: 0;
 }
 
-/* Media Queries */
 @media (max-width: 780px) {
   .back {
     padding: 20px 10px;
@@ -190,25 +250,16 @@ form button:active {
     gap: 12px;
     width: 100%;
   }
-  
-  .signup_options a {
-    justify-content: center;
-    padding: 12px 20px;
-    gap: 2px;
-  }
 }
 
-/* Post Form.........
-.............................................................
-.............................................................. */
-
+/* Post Form */
 .postform_header {
   display: flex;
   align-items: center;
   gap: 20px;
   padding: 20px;
-  border-bottom: 1px solid #E0E0E0;
-  background: white;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-bg);
 }
 
 .postform_header a {
@@ -228,7 +279,7 @@ form button:active {
 
 .postform_header h2 {
   margin: 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 24px;
 }
 
@@ -243,14 +294,16 @@ form {
 
 textarea {
   padding: 20px;
-  border: 2px solid #E0E0E0;
+  background: var(--input-bg);
+  border: 2px solid var(--border-color);
   border-radius: 12px;
   font-size: 16px;
   font-family: inherit;
   resize: vertical;
   min-height: 200px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  color: var(--text-primary);
 }
 
 textarea:focus {
@@ -259,7 +312,6 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(30, 161, 217, 0.2);
 }
 
-/* Image Upload Section */
 .image-upload-section {
   display: flex;
   flex-direction: column;
@@ -273,10 +325,10 @@ input[type="file"] {
 .upload-label {
   display: inline-block;
   padding: 15px 25px;
-  background: white;
-  border: 2px dashed #E0E0E0;
+  background: var(--card-bg);
+  border: 2px dashed var(--border-color);
   border-radius: 12px;
-  color: #666;
+  color: var(--text-secondary);
   font-weight: 500;
   text-align: center;
   cursor: pointer;
@@ -286,11 +338,10 @@ input[type="file"] {
 
 .upload-label:hover {
   border-color: #1EA1D9;
-  background: #f8fdff;
+  background: var(--hover-color);
   color: #1EA1D9;
 }
 
-/* Image Preview */
 .image-preview {
   position: relative;
   display: inline-block;
@@ -302,8 +353,8 @@ input[type="file"] {
   width: 100%;
   height: auto;
   border-radius: 12px;
-  border: 2px solid #E0E0E0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .remove-image {
@@ -356,11 +407,10 @@ button[type="submit"]:disabled {
   opacity: 0.6;
 }
 
-/* Character Counter */
 .char-counter {
   text-align: right;
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
   margin-top: -15px;
 }
 
@@ -435,14 +485,13 @@ button[type="submit"]:disabled {
   }
 }
 
-/*Navbar...................................
-.................................................*/
+/* Navbar */
 .navbar {
   position: fixed;
   top: 0;
   width: 100%;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--bg-primary);
+  box-shadow: 0 2px 8px var(--shadow-color);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -463,7 +512,7 @@ button[type="submit"]:disabled {
 }
 
 .navlinks a {
-  color: #333;
+  color: var(--text-primary);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
@@ -473,20 +522,17 @@ button[type="submit"]:disabled {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #333;
+  color: var(--text-primary);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
 .navbar .logo a:hover {
-  color: #666;
+  color: var(--text-secondary);
 }
 
-/* Viewposts.............................................
-........................................................................
-..................................................................... */
-
+/* Viewposts */
 .peak {
   margin-top: 90px;
   margin-bottom: 60px;
@@ -497,37 +543,39 @@ button[type="submit"]:disabled {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  background-color: transparent !important; /* Remove red */
+  background-color: transparent !important;
 }
 
 .high {
-  background: white;
+  background: var(--card-bg);
   padding: 15px;
-  margin: 5px 10px !important; /* Force margin */
+  margin: 5px 10px !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   box-shadow: 0 4px 12px rgba(139, 51, 187, 0.3);
   border-radius: 15px;
+  border: 1px solid var(--border-color);
 }
 
 .high-comment {
-  background: white;
+  background: var(--card-bg);
   margin-left: 10px;
   margin-right: 10px;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  box-sizing: border-box; /* Add this line */
+  box-sizing: border-box;
   box-shadow: 0 4px 12px rgba(139, 51, 187, 0.3);
   border-radius: 15px;
+  border: 1px solid var(--border-color);
 }
 
 .high-comment h2 {
    padding: 16px 20px;
   margin: 0;
-  color: #262626;
+  color: var(--text-primary);
   font-size: 15px;
   line-height: 1.6;
   font-weight: 400;
-  border-bottom: 1px solid #EFEFEF;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .profileSide {
@@ -535,7 +583,7 @@ button[type="submit"]:disabled {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #EFEFEF;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .postProfile {
@@ -549,7 +597,7 @@ button[type="submit"]:disabled {
   height: 42px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #E0E0E0;
+  border: 2px solid var(--border-color);
   transition: border-color 0.3s ease;
 }
 
@@ -559,7 +607,7 @@ button[type="submit"]:disabled {
 
 .postProfile a {
   text-decoration: none;
-  color: #262626;
+  color: var(--text-primary);
   font-weight: 600;
   font-size: 14px;
   transition: color 0.3s ease;
@@ -587,25 +635,25 @@ button[type="submit"]:disabled {
 }
 
 .postFoll button.following {
-  background: #EFEFEF;
-  color: #262626;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .high h2 {
   padding: 16px 20px;
   margin: 0;
-  color: #262626;
+  color: var(--text-primary);
   font-size: 15px;
   line-height: 1.6;
   font-weight: 400;
-  border-bottom: 1px solid #EFEFEF;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .high .postImg {
   width: 100%;
   max-height: 600px;
   object-fit: cover;
-  background: #FAFAFA;
+  background: var(--bg-secondary);
   display: block;
   transition: opacity 0.3s ease;
   border-radius: 15px;
@@ -620,7 +668,7 @@ button[type="submit"]:disabled {
   display: flex;
   align-items: center;
   gap: 20px;
-  border-top: 1px solid #EFEFEF;
+  border-top: 1px solid var(--border-color);
 }
 
 .action-left {
@@ -640,21 +688,20 @@ button[type="submit"]:disabled {
   width: 0;
   height: 0;
 }
+
 .postAction label {
   font-size: 24px;
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
-  color: #c4bebe;
+  color: var(--text-secondary);
   padding: 4px;
 }
 
-/* Change this to attribute selector */
 .likes-count {
   position: relative;
 }
 
-/* Add this to your CSS file */
 .likes-count label[style*="color: red"] {
   color: red !important;
 }
@@ -664,18 +711,18 @@ button[type="submit"]:disabled {
 }
 
 #bookmark:checked + label {
-  color: #262626;
+  color: var(--text-primary);
   transform: scale(1.1);
 }
 
 .postAction label:hover {
   transform: scale(1.15);
-  color: #8E8E8E;
+  color: var(--text-secondary);
 }
-/* Engagement stats */
+
 .engagement {
   padding: 0 20px 12px;
-  border-bottom: 1px solid #EFEFEF;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .likes-count {
@@ -687,21 +734,22 @@ button[type="submit"]:disabled {
 .likes-count p {
   font-weight: 600;
   font-size: 14px;
-  color: #8E8E8E;
+  color: var(--text-secondary);
 }
 
 .likes-count a {
   text-decoration: none;
-  color: #8E8E8E;
+  color: var(--text-secondary);
 }
 
 .timestamp {
   font-size: 12px;
-  color: #8E8E8E;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
+/* Loading Skeletons */
 .loading-skeleton {
   pointer-events: none;
 }
@@ -710,7 +758,7 @@ button[type="submit"]:disabled {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--skeleton-bg) 25%, var(--border-color) 50%, var(--skeleton-bg) 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
 }
@@ -719,7 +767,7 @@ button[type="submit"]:disabled {
   width: 100px;
   height: 16px;
   border-radius: 4px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--skeleton-bg) 25%, var(--border-color) 50%, var(--skeleton-bg) 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   margin-left: 10px;
@@ -729,7 +777,7 @@ button[type="submit"]:disabled {
   width: 80%;
   height: 14px;
   border-radius: 4px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--skeleton-bg) 25%, var(--border-color) 50%, var(--skeleton-bg) 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   margin: 10px 0;
@@ -739,7 +787,7 @@ button[type="submit"]:disabled {
   width: 100%;
   height: 200px;
   border-radius: 8px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--skeleton-bg) 25%, var(--border-color) 50%, var(--skeleton-bg) 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   margin: 10px 0;
@@ -749,7 +797,7 @@ button[type="submit"]:disabled {
   width: 60px;
   height: 20px;
   border-radius: 4px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--skeleton-bg) 25%, var(--border-color) 50%, var(--skeleton-bg) 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   margin: 5px;
@@ -766,7 +814,7 @@ button[type="submit"]:disabled {
 
 @media(max-width: 780px) {
   .high {
-    background: white;
+    background: var(--card-bg);
     margin: 10px;
     margin-bottom: 0px;
   }
@@ -777,7 +825,7 @@ button[type="submit"]:disabled {
   max-height: 400px;
   object-fit: cover;
   cursor: pointer;
-  background: #FAFAFA;
+  background: var(--bg-secondary);
   display: block;
   transition: opacity 0.3s ease;
   border-radius: 15px;
@@ -788,21 +836,7 @@ button[type="submit"]:disabled {
   object-fit: contain;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-/* Comments section...............................
-....................................................................
-.......................................................................*/
+/* Comments section */
 .comments {
   padding: 12px 20px;
 }
@@ -821,7 +855,7 @@ button[type="submit"]:disabled {
 .comment-user {
   font-weight: 600;
   font-size: 14px;
-  color: #262626;
+  color: var(--text-primary);
   text-decoration: none;
 }
 
@@ -831,7 +865,7 @@ button[type="submit"]:disabled {
 
 .comment-text {
   font-size: 14px;
-  color: #262626;
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
@@ -840,7 +874,7 @@ button[type="submit"]:disabled {
   align-items: center;
   gap: 12px;
   padding-top: 12px;
-  border-top: 1px solid #EFEFEF;
+  border-top: 1px solid var(--border-color);
 }
 
 .add-comment input {
@@ -849,11 +883,12 @@ button[type="submit"]:disabled {
   outline: none;
   font-size: 14px;
   padding: 8px 0;
-  color: #262626;
+  color: var(--text-primary);
+  background: transparent;
 }
 
 .add-comment input::placeholder {
-  color: #8E8E8E;
+  color: var(--text-secondary);
 }
 
 .add-comment button {
@@ -871,6 +906,76 @@ button[type="submit"]:disabled {
   opacity: 1;
 }
 
+.comments-section {
+  padding-bottom: 100px !important;
+}
+
+.comment-card {
+  background: var(--card-bg);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 40px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.comment-card:last-child {
+  margin-bottom: 30px;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-user h4 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.comment-user span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.comment-text {
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.like-btn, .reply-btn {
+  background: none;
+  border: none;
+  color: #1EA1D9;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 5px 0;
+}
+
+.like-btn:hover, .reply-btn:hover {
+  color: #8B33BB;
+}
+
 @media (max-width: 780px) {
   .high {
     margin-top: 70px;
@@ -879,7 +984,7 @@ button[type="submit"]:disabled {
   
   .post-card {
     border-radius: 8px;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 6px var(--shadow-color);
   }
   
   .profileSide {
@@ -915,87 +1020,7 @@ button[type="submit"]:disabled {
   .engagement, .comments {
     padding: 0 16px 10px;
   }
-}
-
-/* Comments */
-.comment {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.comment-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.comment-user h4 {
-  margin: 0;
-  color: #333;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.comment-user span {
-  color: #666;
-  font-size: 12px;
-}
-
-.comment-text {
-  color: #333;
-  line-height: 1.5;
-  margin-bottom: 10px;
-  font-size: 14px;
-}
-
-.comment-actions {
-  display: flex;
-  gap: 15px;
-}
-
-.like-btn, .reply-btn {
-  background: none;
-  border: none;
-  color: #1EA1D9;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  padding: 5px 0;
-}
-
-.like-btn:hover, .reply-btn:hover {
-  color: #8B33BB;
-}
-
-.comments-section {
-  padding-bottom: 100px !important; /* Add space above bottom bar */
-}
-
-.comment-card {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 40px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.comment-card:last-child {
-  margin-bottom: 30px; /* Extra space for last comment */
-}
-
-@media (max-width: 780px) {
+  
   .comment {
     padding: 12px;
     border-radius: 8px;
@@ -1019,28 +1044,23 @@ button[type="submit"]:disabled {
   }
 }
 
-/*Bottombar bar*/
-
+/* Bottom Bar */
 .bottomBar {
-    background: linear-gradient(135deg, #1EA1D9, #8B33BB);
-    display: flex;
-    justify-content: space-evenly;
-    padding: 10px;
-    border-radius: 10px;
-    position: fixed;
-    bottom: 30px;
-    right: 10px;
-    left: 15px;
-    align-items: center;
+  background: linear-gradient(135deg, #1EA1D9, #8B33BB);
+  display: flex;
+  justify-content: space-evenly;
+  padding: 10px;
+  border-radius: 10px;
+  position: fixed;
+  bottom: 30px;
+  right: 10px;
+  left: 15px;
+  align-items: center;
 }
 
 .bottomBar img {
   width: 40px;
   height: auto;
-}
-
-.bottomBar .plus {
-  
 }
 
 @media(max-width: 780px){
@@ -1053,12 +1073,10 @@ button[type="submit"]:disabled {
   }
 }
 
-/* Profile Screen ..................................................................
-.....................................................................*/
-
+/* Profile Screen */
 .profile-screen {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   padding: 20px;
   padding-bottom: 100px;
 }
@@ -1099,12 +1117,13 @@ button[type="submit"]:disabled {
 }
 
 .profile-header {
-  background: white;
+  background: var(--card-bg);
   border-radius: 16px;
   padding: 30px 20px;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 10px var(--shadow-color);
   margin-bottom: 20px;
+  border: 1px solid var(--border-color);
 }
 
 .profile-image-section {
@@ -1122,8 +1141,8 @@ button[type="submit"]:disabled {
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: 3px solid var(--card-bg);
+  box-shadow: 0 4px 12px var(--shadow-color);
   cursor: default;
 }
 
@@ -1147,7 +1166,7 @@ button[type="submit"]:disabled {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border: 2px solid white;
+  border: 2px solid var(--card-bg);
   border: none;
   padding: 0;
 }
@@ -1205,47 +1224,48 @@ button[type="submit"]:disabled {
   font-size: 24px;
   font-weight: 600;
   margin: 0 0 5px 0;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .profile-username {
-  color: #666;
+  color: var(--text-secondary);
   margin: 0 0 5px 0;
   font-size: 16px;
 }
 
 .profile-email {
-  color: #888;
+  color: var(--text-tertiary);
   margin: 0 0 15px 0;
   font-size: 14px;
 }
 
 .profile-bio {
-  color: #555;
+  color: var(--text-secondary);
   font-size: 15px;
   line-height: 1.4;
   margin: 0;
   padding: 15px;
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   border-radius: 12px;
   border-left: 3px solid #1EA1D9;
 }
 
 .profile-navigation {
-  background: white;
+  background: var(--card-bg);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 10px var(--shadow-color);
+  border: 1px solid var(--border-color);
 }
 
 .profile-link {
   display: block;
   padding: 18px 20px;
   text-decoration: none;
-  color: #333;
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 500;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color);
   transition: all 0.3s ease;
   background: none;
   border: none;
@@ -1256,7 +1276,7 @@ button[type="submit"]:disabled {
 }
 
 .profile-link:hover {
-  background: #f8f9fa;
+  background: var(--hover-color);
   color: #1EA1D9;
 }
 
@@ -1389,21 +1409,14 @@ button[type="submit"]:disabled {
   background: rgba(255, 255, 255, 0.3);
 }
 
-
-
-
-
-/*Post Anonymous....................................
-.......................................................................
-............................................................................*/
-
+/* Post Anonymous */
 .postghost a {
   padding: 10px;
   background: linear-gradient(135deg, #1EA1D9 0%, #8B33BB 100%);
   border-radius: 10px;
   position: fixed;
-     right: 10px;
-    bottom: 120px;
+  right: 10px;
+  bottom: 120px;
 }
 
 .postghost a img {
@@ -1411,33 +1424,19 @@ button[type="submit"]:disabled {
   height: 30px;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-/* Comment input.........................................................
-........................................................................................
-...................................................................................... */
 /* Comment input */
 .comment {
   padding: 12px 20px;
   display: flex;
   align-items: flex-start;
-  border-top: 1px solid #EFEFEF;
-  background: white;
+  border-top: 1px solid var(--border-color);
+  background: var(--card-bg);
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   width: 100%;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 -2px 10px var(--shadow-color);
 }
 
 .comment input {
@@ -1446,12 +1445,13 @@ button[type="submit"]:disabled {
   outline: none;
   font-size: 14px;
   padding: 8px 0;
-  color: #262626;
-  margin-right: 80px; /* Space for button */
+  color: var(--text-primary);
+  margin-right: 80px;
+  background: transparent;
 }
 
 .comment input::placeholder {
-  color: #8E8E8E;
+  color: var(--text-secondary);
 }
 
 .comment button {
@@ -1492,11 +1492,6 @@ button[type="submit"]:disabled {
   }
 }
 
-
-
-
-
-
 /* Comments Section */
 .comments-section {
   margin: 0;
@@ -1504,11 +1499,12 @@ button[type="submit"]:disabled {
 }
 
 .comment-card {
-  background: white;
+  background: var(--card-bg);
   margin: 8px 0;
   padding: 16px;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
+  border: 1px solid var(--border-color);
 }
 
 .comment-header {
@@ -1532,7 +1528,7 @@ button[type="submit"]:disabled {
 }
 
 .comment-username {
-  color: #262626;
+  color: var(--text-primary);
   font-weight: 600;
   font-size: 14px;
   text-decoration: none;
@@ -1554,7 +1550,7 @@ button[type="submit"]:disabled {
 }
 
 .comment-text {
-  color: #262626;
+  color: var(--text-primary);
   font-size: 14px;
   line-height: 1.4;
   margin: 0 0 12px 0;
@@ -1583,7 +1579,7 @@ button[type="submit"]:disabled {
   font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #8E8E8E;
+  color: var(--text-secondary);
 }
 
 .action-item label:hover {
@@ -1592,7 +1588,7 @@ button[type="submit"]:disabled {
 
 .action-item span, .action-item a {
   font-size: 12px;
-  color: #8E8E8E;
+  color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
 }
@@ -1626,25 +1622,16 @@ button[type="submit"]:disabled {
   }
 }
 
-
-
-
-
-
-
-
-
-/*ProfileIdScreen............................................
-...........................................................................
-.................Picture Side*/
+/* ProfileIdScreen - Picture Side */
 .container {
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px var(--shadow-color);
   overflow: hidden;
   position: relative;
   height: 65vh;
   padding: 20px;
+  border: 1px solid var(--border-color);
 }
 
 .coverPhoto {
@@ -1655,7 +1642,7 @@ button[type="submit"]:disabled {
 
 .profileContent {
   text-align: center;
-  padding: 20px; text-align: center;
+  padding: 20px;
   padding: 0 20px 20px 20px;
   position: absolute;
   top: 100px;
@@ -1667,7 +1654,7 @@ button[type="submit"]:disabled {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  border: 4px solid white;
+  border: 4px solid var(--card-bg);
   object-fit: cover;
   margin-bottom: 15px;
   z-index: 1;
@@ -1677,11 +1664,12 @@ button[type="submit"]:disabled {
   font-size: 24px;
   margin: 10px 0 5px 0;
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .profileContent p {
   margin: 5px 0;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
@@ -1702,7 +1690,7 @@ button[type="submit"]:disabled {
   gap: 30px;
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-color);
 }
 
 .follows {
@@ -1712,17 +1700,16 @@ button[type="submit"]:disabled {
 .follows h1 {
   font-size: 20px;
   margin: 0;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .follows p {
   font-size: 14px;
   margin: 5px 0 0 0;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 @media (max-width: 414px) {
-  /* iPhone 11 Pro, XR, 6/7/8 Plus */
   .container {
     height: 60vh;
     padding: 15px;
@@ -1756,7 +1743,6 @@ button[type="submit"]:disabled {
 }
 
 @media (max-width: 375px) {
-  /* iPhone 6/7/8, X, 11 Pro, 12/13 mini */
   .container {
     height: 70vh;
     padding: 12px;
@@ -1795,7 +1781,6 @@ button[type="submit"]:disabled {
 }
 
 @media (max-width: 320px) {
-  /* iPhone SE, 5 */
   .container {
     height: 65vh;
     padding: 10px;
@@ -1809,8 +1794,6 @@ button[type="submit"]:disabled {
     top: 60px;
     padding: 0 10px 10px 10px;
   }
-  
-
   
   .profileContent h1 {
     font-size: 16px;
@@ -1841,39 +1824,21 @@ button[type="submit"]:disabled {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*Update profile form.....................................................
-.............................................................................................
-.....................................................................................................
-............................................*/
-
+/* Update profile form */
 .edit-profile-form {
   max-width: 500px;
   margin: 0 auto;
   padding: 20px;
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px var(--shadow-color);
+  border: 1px solid var(--border-color);
 }
 
 .edit-profile-form h2 {
   text-align: center;
   margin-bottom: 20px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .form-group {
@@ -1884,17 +1849,19 @@ button[type="submit"]:disabled {
   display: block;
   margin-bottom: 5px;
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ddd;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 14px;
   box-sizing: border-box;
+  color: var(--text-primary);
 }
 
 .form-group textarea {
@@ -1918,10 +1885,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-
-/*React Icons......................................................................................
-..........................................................................................................*/
-
+/* React Icons */
 .icon-btn {
   background: none;
   border: none;
@@ -1931,32 +1895,21 @@ button:disabled {
 
 .icon {
   font-size: 1.2rem;
-  color: #666;
+  color: var(--text-secondary);
   transition: color 0.2s;
 }
 
 .icon:hover {
-  color: #333;
+  color: var(--text-primary);
 }
 
 .liked {
   color: #1EA1D9;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 /* Followers Screen */
 .followers-screen {
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   min-height: 100vh;
   padding: 20px;
   padding-top: 80px;
@@ -1964,17 +1917,18 @@ button:disabled {
 }
 
 .followers-header {
-  background: white;
+  background: var(--card-bg);
   padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 10px var(--shadow-color);
   margin-bottom: 15px;
   text-align: center;
+  border: 1px solid var(--border-color);
 }
 
 .followers-header h2 {
   margin: 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 24px;
   font-weight: 600;
 }
@@ -1986,19 +1940,20 @@ button:disabled {
 }
 
 .follower-card {
-  background: white;
+  background: var(--card-bg);
   padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 10px var(--shadow-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
   transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
 }
 
 .follower-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 15px var(--shadow-color);
 }
 
 .follower-info {
@@ -2020,7 +1975,7 @@ button:disabled {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border: 3px solid #E0E0E0;
+  border: 3px solid var(--border-color);
   border-radius: 50%;
   transition: border-color 0.3s ease;
 }
@@ -2039,7 +1994,7 @@ button:disabled {
 .follower-name {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   text-decoration: none;
   display: block;
   margin-bottom: 4px;
@@ -2051,7 +2006,7 @@ button:disabled {
 }
 
 .follower-username {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
   margin: 0 0 8px 0;
 }
@@ -2136,22 +2091,22 @@ button:disabled {
 }
 
 .unfollow-btn {
-  background: #E0E0E0;
-  color: #666;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px var(--shadow-color);
 }
 
 .unfollow-btn:hover {
-  background: #d6d6d6;
-  color: #555;
+  background: var(--hover-color);
+  color: var(--text-primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .empty-state p {
@@ -2159,7 +2114,7 @@ button:disabled {
   margin: 0;
 }
 
-/* Loading Skeletons */
+/* Loading Skeletons for followers */
 .follower-card.loading-skeleton {
   pointer-events: none;
 }
@@ -2172,7 +2127,7 @@ button:disabled {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--skeleton-bg) 25%, var(--border-color) 50%, var(--skeleton-bg) 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
 }
@@ -2181,17 +2136,12 @@ button:disabled {
   width: 120px;
   height: 16px;
   border-radius: 8px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--skeleton-bg) 25%, var(--border-color) 50%, var(--skeleton-bg) 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
 }
 
-@keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Responsive */
+/* Responsive for followers */
 @media (max-width: 780px) {
   .followers-screen {
     padding: 15px;
@@ -2241,22 +2191,6 @@ button:disabled {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* NotFound.css */
 .notfound-container {
   min-height: 100vh;
@@ -2287,15 +2221,16 @@ button:disabled {
 
 .notfound-content {
   text-align: center;
-  background: white;
+  background: var(--card-bg);
   padding: 50px 40px;
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px var(--shadow-color);
   max-width: 500px;
   width: 100%;
   position: relative;
   z-index: 1;
   animation: slideUp 0.6s ease-out;
+  border: 1px solid var(--border-color);
 }
 
 @keyframes slideUp {
@@ -2369,14 +2304,14 @@ button:disabled {
 .notfound-title {
   font-size: 32px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 15px;
   font-family: Arial, Helvetica, sans-serif;
 }
 
 .notfound-message {
   font-size: 16px;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 30px;
   font-family: Arial, Helvetica, sans-serif;
@@ -2416,23 +2351,22 @@ button:disabled {
 }
 
 .notfound-button.secondary {
-  background: white;
-  color: #333;
-  border: 2px solid #E0E0E0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  box-shadow: 0 2px 8px var(--shadow-color);
 }
 
 .notfound-button.secondary:hover {
   border-color: #1EA1D9;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .notfound-button:active {
   transform: translateY(0);
 }
 
-/* Responsive Design */
 @media (max-width: 780px) {
   .notfound-container {
     padding: 15px;
@@ -2508,4 +2442,185 @@ button:disabled {
   .icon-text {
     font-size: 24px;
   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Settings Screen */
+.settings-screen {
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  padding: 20px;
+  padding-bottom: 100px;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px 0;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.back-button:hover {
+  background: var(--hover-color);
+  transform: translateY(-2px);
+}
+
+.settings-header h1 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.settings-content {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 10px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-item:last-child {
+  border-bottom: none;
+}
+
+.settings-info {
+  flex: 1;
+}
+
+.settings-info h3 {
+  margin: 0 0 5px 0;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.settings-info p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 780px) {
+  .settings-screen {
+    padding: 15px;
+    padding-bottom: 90px;
+  }
+  
+  .settings-header {
+    padding: 15px 0;
+  }
+  
+  .settings-header h1 {
+    font-size: 24px;
+  }
+  
+  .settings-content {
+    padding: 15px;
+    border-radius: 12px;
+  }
+  
+  .settings-item {
+    padding: 15px 0;
+  }
+  
+  .settings-info h3 {
+    font-size: 16px;
+  }
+  
+  .settings-info p {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-screen {
+    padding: 10px;
+    padding-bottom: 80px;
+  }
+  
+  .settings-header {
+    gap: 10px;
+  }
+  
+  .back-button {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .settings-header h1 {
+    font-size: 22px;
+  }
+  
+  .settings-content {
+    padding: 12px;
+    border-radius: 10px;
+  }
+  
+  .settings-item {
+    padding: 12px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .settings-info {
+    width: 100%;
+  }
+}
+
+
+
+/* Larger toggle for settings */
+.theme-toggle.settings-toggle {
+  width: 60px;
+  height: 60px;
+}
+
+.theme-toggle.settings-toggle .theme-icon {
+  font-size: 1.5rem;
 }
