@@ -1,43 +1,63 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { useGetFollowersQuery } from '../slices/userApiSlice'
-import { useFollowUserMutation, useUnfollowUserMutation } from '../slices/userApiSlice'
-import { useSelector } from 'react-redux'
-import Bottombar from '../components/Bottombar.jsx'
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  useGetFollowersQuery,
+  useGetUserProfileQuery,
+} from "../slices/userApiSlice";
+import {
+  useFollowUserMutation,
+  useUnfollowUserMutation,
+} from "../slices/userApiSlice";
+import { useSelector } from "react-redux";
+import Bottombar from "../components/Bottombar.jsx";
 
 const FollowersScreen = () => {
-  const { userInfo } = useSelector((state) => state.auth)
-  const { data: followers, isLoading, refetch } = useGetFollowersQuery(userInfo?._id)
-  const [followUser] = useFollowUserMutation()
-  const [unfollowUser] = useUnfollowUserMutation()
+  const { userInfo } = useSelector((state) => state.auth);
+  const {
+    data: followers,
+    isLoading,
+    refetch: refetchFollowers,
+  } = useGetFollowersQuery(userInfo?._id);
+
+  const { data: currentUser, refetch: refetchCurrentUser } =
+    useGetUserProfileQuery();
+
+  const [followUser] = useFollowUserMutation();
+  const [unfollowUser] = useUnfollowUserMutation();
 
   const handleFollow = async (userId) => {
     try {
-      await followUser(userId).unwrap()
-      refetch()
+      await followUser(userId).unwrap();
+      refetchFollowers();
+      refetchCurrentUser();
     } catch (error) {
-      console.error('Follow error:', error)
+      console.error("Follow error:", error);
     }
-  }
+  };
 
   const handleUnfollow = async (userId) => {
     try {
-      await unfollowUser(userId).unwrap()
-      refetch()
+      await unfollowUser(userId).unwrap();
+      refetchFollowers();
+      refetchCurrentUser();
     } catch (error) {
-      console.error('Unfollow error:', error)
+      console.error("Unfollow error:", error);
     }
-  }
+  };
 
-const isFollowing = (user) => {
-  console.log('userInfo following:', userInfo?.following)
-  console.log('target user:', user._id)
-  return userInfo?.following?.includes(user._id)
-}
+  // Use currentUser data for following status
+  const isFollowing = (user) => {
+    if (!currentUser?.following) return false;
+    return currentUser.following.some(
+      (followedUser) => followedUser._id === user._id
+    );
+  };
 
-const isFriends = (user) => {
-  return isFollowing(user) && user.following?.some(followingUser => followingUser._id === userInfo?._id)
-}
+  // Check mutual follow for friends badge
+  // In FollowersScreen component - simplified isFriends
+  const isFriends = (user) => {
+    return user.isMutualFollow; // Now using backend data
+  };
 
   if (isLoading) {
     return (
@@ -54,27 +74,26 @@ const isFriends = (user) => {
           </div>
         ))}
       </div>
-    )
+    );
   }
 
   return (
     <div className="followers-screen">
-        
       <div className="followers-header">
         <h2>Followers ({followers?.followersCount || 0})</h2>
       </div>
-      
+
       <div className="followers-list">
         {followers?.followers?.map((follower) => (
           <div className="follower-card" key={follower._id}>
             <div className="follower-info">
               <Link to={`/profile/${follower._id}`} className="follower-avatar">
-                <img 
-                  src={follower.profile || "/default-avatar.jpg"} 
+                <img
+                  src={follower.profile || "/default-avatar.jpg"}
                   alt={follower.username}
                 />
               </Link>
-              
+
               <div className="follower-details">
                 <Link to={`/profile/${follower._id}`} className="follower-name">
                   {follower.name}
@@ -86,17 +105,17 @@ const isFriends = (user) => {
               </div>
             </div>
 
-            {userInfo && userInfo._id !== follower._id && (
+            {currentUser && currentUser._id !== follower._id && (
               <div className="follower-actions">
                 {isFollowing(follower) ? (
-                  <button 
+                  <button
                     className="unfollow-btn"
                     onClick={() => handleUnfollow(follower._id)}
                   >
                     Unfollow
                   </button>
                 ) : (
-                  <button 
+                  <button
                     className="follow-btn"
                     onClick={() => handleFollow(follower._id)}
                   >
@@ -107,7 +126,7 @@ const isFriends = (user) => {
             )}
           </div>
         ))}
-        
+
         {followers?.followers?.length === 0 && (
           <div className="empty-state">
             <p>No followers yet</p>
@@ -116,7 +135,7 @@ const isFriends = (user) => {
       </div>
       <Bottombar />
     </div>
-  )
-}
+  );
+};
 
-export default FollowersScreen
+export default FollowersScreen;

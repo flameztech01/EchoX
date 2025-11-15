@@ -1960,6 +1960,7 @@ button:disabled {
   min-height: 100vh;
   padding: 20px;
   padding-top: 80px;
+  margin-bottom: 70px;
 }
 
 .followers-header {
@@ -2030,6 +2031,9 @@ button:disabled {
 
 .follower-details {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .follower-name {
@@ -2052,48 +2056,96 @@ button:disabled {
   margin: 0 0 8px 0;
 }
 
+/* Professional Friends Badge */
 .friends-badge {
   background: linear-gradient(135deg, #1EA1D9, #8B33BB);
   color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(30, 161, 217, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.friends-badge::before {
+  content: "✓";
+  font-weight: bold;
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.friends-badge::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.friends-badge:hover::after {
+  left: 100%;
 }
 
 .follower-actions {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .follow-btn, .unfollow-btn {
-  padding: 8px 20px;
+  padding: 10px 24px;
   border: none;
-  border-radius: 20px;
+  border-radius: 25px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
+  min-width: 100px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .follow-btn {
   background: linear-gradient(135deg, #1EA1D9, #8B33BB);
   color: white;
+  box-shadow: 0 2px 8px rgba(30, 161, 217, 0.3);
 }
 
 .follow-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(30, 161, 217, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(30, 161, 217, 0.4);
 }
 
 .unfollow-btn {
   background: #E0E0E0;
   color: #666;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .unfollow-btn:hover {
-  background: #ff4444;
-  color: white;
-  transform: translateY(-1px);
+  background: #d6d6d6;
+  color: #555;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .empty-state {
@@ -2148,6 +2200,13 @@ button:disabled {
   
   .follower-card {
     padding: 15px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .follower-info {
+    width: 100%;
   }
   
   .follower-avatar {
@@ -2163,12 +2222,24 @@ button:disabled {
     font-size: 13px;
   }
   
+  .follower-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
   .follow-btn, .unfollow-btn {
-    padding: 6px 16px;
+    padding: 8px 20px;
     font-size: 13px;
+    min-width: 90px;
+    height: 36px;
+  }
+  
+  .friends-badge {
+    padding: 5px 12px;
+    font-size: 11px;
   }
 }
-
 
 
 

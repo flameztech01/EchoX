@@ -255,14 +255,26 @@ const registerUser = asyncHandler(async (req, res, next) => {
 });
 
 //Get User Profile
+//Get User Profile - FIX THIS TOO
 const getUserProfile = asyncHandler(async (req, res, next) => {
-  const user = {
-    id: req.user._id,
-    username: req.user.username,
-    email: req.user.email,
-  };
+  const user = await User.findById(req.user._id)
+    .select('-password')
+    .populate('following', '_id');
 
-  res.status(200).json(user);
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  res.status(200).json({
+    _id: user._id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    profile: user.profile,
+    bio: user.bio,
+    following: user.following || []
+  });
 });
 
 //Get any User Profile
@@ -341,7 +353,7 @@ const logoutUser = asyncHandler(async (req, res, next) => {
   res.status(200).json("You don log out. Do quick come back sha");
 });
 
-// In followUser controller - update the response
+// FOLLOW USER
 const followUser = asyncHandler(async (req, res, next) => {
   const userIdToFollow = req.params.id;
   const currentUserId = req.user._id;
@@ -386,7 +398,8 @@ const followUser = asyncHandler(async (req, res, next) => {
   });
 });
 
-// In unfollowUser controller - update the response
+//UNFOLLOW USER.........................................
+
 const unfollowUser = asyncHandler(async (req, res, next) => {
   const userIdToUnfollow = req.params.id;
   const currentUserId = req.user._id;
@@ -415,7 +428,7 @@ const unfollowUser = asyncHandler(async (req, res, next) => {
   await currentUser.save();
   await userToUnfollow.save();
 
-  // Get the updated user with populated followers
+  //UPDATED USER
   const updatedUser = await User.findById(userIdToUnfollow)
     .select("-password")
     .populate("followers", "_id")
@@ -431,13 +444,15 @@ const unfollowUser = asyncHandler(async (req, res, next) => {
   });
 });
 
-// Get user's followers
+// GET FOLLOWERS
+// GET FOLLOWERS - FIX THIS FUNCTION
+// GET FOLLOWERS - ADD MUTUAL FOLLOW INFO
 const getFollowers = asyncHandler(async (req, res, next) => {
   const userId = req.params.id || req.user._id;
 
   const user = await User.findById(userId).populate(
     "followers",
-    "name username profile bio"
+    "name username profile bio followers following"
   );
 
   if (!user) {
@@ -445,10 +460,22 @@ const getFollowers = asyncHandler(async (req, res, next) => {
     throw new Error("User no dey here");
   }
 
+  // Get current user's following list to check mutual follows
+  const currentUser = await User.findById(req.user._id).select('following');
+  
+  // Add mutual follow info to each follower
+  const followersWithMutualInfo = user.followers.map(follower => {
+    const isMutualFollow = currentUser.following.includes(follower._id);
+    return {
+      ...follower.toObject(),
+      isMutualFollow
+    };
+  });
+
   res.status(200).json({
     message: `Followers for ${user.username}`,
     followersCount: user.followers.length,
-    followers: user.followers,
+    followers: followersWithMutualInfo,
   });
 });
 
