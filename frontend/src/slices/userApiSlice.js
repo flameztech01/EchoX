@@ -36,6 +36,15 @@ export const userApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    // Add this mutation
+updateDarkMode: builder.mutation({
+  query: (data) => ({
+    url: `${USER_URL}/dark-mode`,
+    method: "PUT",
+    body: data,
+  }),
+}),
+
     getUserProfile: builder.query({
       query: () => ({
         url: `${USER_URL}/profile`,
@@ -118,6 +127,7 @@ export const {
   useGoogleAuthMutation,
   useFacebookAuthMutation,
   useRegisterMutation,
+  useUpdateDarkModeMutation,
   useGetUserProfileQuery,
   useGetOneUserProfileQuery,
   useUpdateProfileMutation,

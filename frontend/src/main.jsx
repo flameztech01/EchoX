@@ -33,6 +33,7 @@ import DeleteAccount from './screens/DeleteAccount.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
 
 import Notfoundscreen from './screens/Notfoundscreen.jsx';
+import ThemeProvider from './components/ThemeProvider.jsx'; // Import ThemeProvider
 
 // Use createRoutesFromElements for better control
 const router = createBrowserRouter(
@@ -76,7 +77,9 @@ createRoot(document.getElementById('root')).render(
   <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <Provider store={store}>
       <StrictMode>
-        <RouterProvider router={router} />
+        <ThemeProvider> {/* Wrap RouterProvider with ThemeProvider */}
+          <RouterProvider router={router} />
+        </ThemeProvider>
       </StrictMode>
     </Provider>
   </GoogleOAuthProvider>

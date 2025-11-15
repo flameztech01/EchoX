@@ -3,6 +3,7 @@ import {
   googleAuth,
   loginUser,
   registerUser,
+  updateDarkMode,
   getUserProfile,
   getAnyUserProfile,
   updateProfile,
@@ -56,6 +57,7 @@ cloudinary.api
 router.post("/google", googleAuth);
 router.post("/login", loginUser);
 router.post("/register", registerUser);
+router.put("/dark-mode", protect, updateDarkMode);
 router.get("/profile", protect, getUserProfile);
 router.get("/profile/:id", protect, getAnyUserProfile);
 router.put("/update-profile", protect, upload.single("image"), updateProfile);

@@ -206,6 +206,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
       bio: userWithFollows.bio,
       profile: userWithFollows.profile,
       following: userWithFollows.following,
+      darkMode: user.darkMode,
       token,
     });
   } else {
@@ -255,6 +256,27 @@ const registerUser = asyncHandler(async (req, res, next) => {
   }
 });
 
+// Update dark mode preference
+const updateDarkMode = asyncHandler(async (req, res, next) => {
+  const { darkMode } = req.body;
+  
+  const user = await User.findById(req.user._id);
+  
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  user.darkMode = darkMode;
+  await user.save();
+
+  res.status(200).json({
+    message: 'Theme preference updated successfully',
+    darkMode: user.darkMode
+  });
+});
+
+
 //Get User Profile
 //Get User Profile - FIX THIS TOO
 const getUserProfile = asyncHandler(async (req, res, next) => {
@@ -274,7 +296,8 @@ const getUserProfile = asyncHandler(async (req, res, next) => {
     email: user.email,
     profile: user.profile,
     bio: user.bio,
-    following: user.following || []
+    following: user.following || [],
+    darkMode: user.darkMode, // Include dark mode preference
   });
 });
 
@@ -575,6 +598,7 @@ export {
   googleAuth,
   loginUser,
   registerUser,
+  updateDarkMode,
   getUserProfile,
   getAnyUserProfile,
   updateProfile,
