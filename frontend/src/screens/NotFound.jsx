@@ -13,7 +13,7 @@ const NotFound = () => {
         <h1 className="notfound-title">Page Not Found</h1>
         <p className="notfound-message">
           Oops! The page you're looking for seems to have wandered off into the
-          digital void.
+          digital void. Decide below
         </p>
         <div className="notfound-actions">
           <Link to="/home" className="notfound-button primary">
