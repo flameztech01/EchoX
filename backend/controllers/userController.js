@@ -4,6 +4,7 @@ import asyncHandler from "express-async-handler";
 import generateToken from "../utils/generateToken.js";
 import { OAuth2Client } from "google-auth-library";
 import { processFacebookAuth } from "../services/facebookAuth.js";
+import DeleteAccount from '../models/deleteUserModel.js';
 
 // Initialize Google OAuth client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -353,6 +354,44 @@ const logoutUser = asyncHandler(async (req, res, next) => {
   res.status(200).json("You don log out. Do quick come back sha");
 });
 
+// Delete User
+const deleteUser = asyncHandler(async (req, res, next) => {
+  const { reason, password } = req.body;
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Verify password before deletion
+  if (!(await user.matchPassword(password))) {
+    res.status(400);
+    throw new Error("Password no correct. You no fit delete account with wrong password.");
+  }
+
+  // Save deletion reason to database
+  await DeleteAccount.create({
+    user: user._id,
+    reason: reason,
+    email: user.email,
+    username: user.username
+  });
+
+  // Delete the user
+  await User.findByIdAndDelete(req.user._id);
+  
+  // Clear the cookie
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+  
+  res.status(200).json({ 
+    message: "Your account don delete successfully. We go miss you!" 
+  });
+});
+
 // FOLLOW USER
 const followUser = asyncHandler(async (req, res, next) => {
   const userIdToFollow = req.params.id;
@@ -485,7 +524,7 @@ const getFollowing = asyncHandler(async (req, res, next) => {
 
   const user = await User.findById(userId).populate(
     "following",
-    "name username profile bio"
+    "name username profile bio followers"
   );
 
   if (!user) {
@@ -493,10 +532,22 @@ const getFollowing = asyncHandler(async (req, res, next) => {
     throw new Error("User no dey here");
   }
 
+  // Get current user's following list to check mutual follows
+  const currentUser = await User.findById(req.user._id).select('following');
+  
+  // Add mutual follow info to each followed user
+  const followingWithMutualInfo = user.following.map(followedUser => {
+    const isMutualFollow = followedUser.followers.includes(req.user._id);
+    return {
+      ...followedUser.toObject(),
+      isMutualFollow
+    };
+  });
+
   res.status(200).json({
     message: `People wey ${user.username} dey follow`,
     followingCount: user.following.length,
-    following: user.following,
+    following: followingWithMutualInfo,
   });
 });
 
@@ -528,6 +579,7 @@ export {
   getAnyUserProfile,
   updateProfile,
   logoutUser,
+  deleteUser,
   followUser,
   unfollowUser,
   getFollowers,

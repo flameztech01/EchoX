@@ -7,6 +7,7 @@ import {
   getAnyUserProfile,
   updateProfile,
   logoutUser,
+  deleteUser,
   followUser,
   unfollowUser,
   getFollowers,
@@ -59,6 +60,7 @@ router.get("/profile", protect, getUserProfile);
 router.get("/profile/:id", protect, getAnyUserProfile);
 router.put("/update-profile", protect, upload.single("image"), updateProfile);
 router.post("/logout", logoutUser);
+router.delete('/delete', protect, deleteUser);
 
 router.post("/follow/:id", protect, followUser);
 router.post("/unfollow/:id", protect, unfollowUser);

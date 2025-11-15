@@ -27,6 +27,9 @@ import Ghostform from './screens/Ghostform.jsx';
 import ProfileIdscreen from './screens/ProfileIdscreen.jsx';
 import Editprofileform from './screens/Editprofileform.jsx';
 import FollowersScreen from './screens/FollowersScreen.jsx';
+import FollowingScreen from './screens/FollowingScreen.jsx';
+import ChangePassword from './screens/ChangePassword.jsx';
+import DeleteAccount from './screens/DeleteAccount.jsx';
 
 import Notfoundscreen from './screens/Notfoundscreen.jsx';
 
@@ -49,6 +52,9 @@ const router = createBrowserRouter(
         <Route path="profile/:id" element={<ProfileIdscreen />} />
         <Route path="edit-profile" element={<Editprofileform />} />
         <Route path="followers" element={<FollowersScreen />} />
+        <Route path='following' element={<FollowingScreen />} />
+        <Route path='change-password' element={<ChangePassword />} />
+        <Route path='delete-account' element={<DeleteAccount />} />
       </Route>
       
       {/* Add explicit 404 route that doesn't interfere with static files */}

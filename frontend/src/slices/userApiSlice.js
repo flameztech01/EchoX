@@ -65,6 +65,16 @@ export const userApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    // Delete User
+    // In userApiSlice.js - add this to endpoints
+    deleteUser: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/delete`,
+        method: "DELETE",
+        body: data,
+      }),
+    }),
+
     // Follow/Unfollow endpoints
     followUser: builder.mutation({
       query: (id) => ({
@@ -112,6 +122,7 @@ export const {
   useGetOneUserProfileQuery,
   useUpdateProfileMutation,
   useLogoutUserMutation,
+  useDeleteUserMutation,
   useFollowUserMutation,
   useUnfollowUserMutation,
   useGetFollowersQuery,
