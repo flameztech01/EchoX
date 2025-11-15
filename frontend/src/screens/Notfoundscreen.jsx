@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const NotFound = () => {
+const Notfoundscreen = () => {
   return (
     <div className="notfound-container">
       <div className="notfound-content">
@@ -31,4 +31,4 @@ const NotFound = () => {
   );
 };
 
-export default NotFound;
+export default Notfoundscreen;

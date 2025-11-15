@@ -28,7 +28,7 @@ import ProfileIdscreen from './screens/ProfileIdscreen.jsx';
 import Editprofileform from './screens/Editprofileform.jsx';
 import FollowersScreen from './screens/FollowersScreen.jsx';
 
-import NotFound from './screens/Notfound.jsx';
+import Notfoundscreen from './screens/Notfoundscreen.jsx';
 
 // Use createRoutesFromElements for better control
 const router = createBrowserRouter(
@@ -52,7 +52,7 @@ const router = createBrowserRouter(
       </Route>
       
       {/* Add explicit 404 route that doesn't interfere with static files */}
-      <Route path="*" element={<NotFound />} />
+      <Route path="*" element={<Notfoundscreen />} />
     </Route>
   ),
   {
