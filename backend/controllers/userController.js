@@ -241,38 +241,45 @@ const loginUser = asyncHandler(async (req, res, next) => {
   console.log("User found:", user);
 
   if (user && (await user.matchPassword(password))) {
-    // Skip OTP for social auth users
-    if (user.authMethod && user.authMethod !== 'local') {
-      const userWithFollows = await User.findById(user._id)
-        .select("-password")
-        .populate("following", "_id");
+    // If user logged in manually (not social auth) and not verified
+    if (!user.authMethod && !user.isVerified) {
+      try {
+        const otp = generateOTP();
+        user.otp = otp;
+        user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+        await user.save();
         
-      const token = generateToken(res, user._id);
-      return res.status(200).json({
-        _id: userWithFollows._id,
-        name: userWithFollows.name,
-        username: userWithFollows.username,
-        email: userWithFollows.email,
-        bio: userWithFollows.bio,
-        profile: userWithFollows.profile,
-        following: userWithFollows.following,
-        darkMode: user.darkMode,
-        token,
-      });
+        await sendOTP(email, otp);
+        
+        return res.status(200).json({
+          message: 'OTP sent to your email',
+          requiresOTP: true,
+          userId: user._id
+        });
+      } catch (emailError) {
+        console.log('Email failed, proceeding without OTP:', emailError);
+        // If email fails, mark as verified and proceed
+        user.isVerified = true;
+        await user.save();
+      }
     }
 
-    // For local auth, always require OTP verification
-    const otp = generateOTP();
-    user.otp = otp;
-    user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
-    await user.save();
-    
-    await sendOTP(email, otp);
-
+    // If verified or social auth, proceed with normal login
+    const userWithFollows = await User.findById(user._id)
+      .select("-password")
+      .populate("following", "_id");
+      
+    const token = generateToken(res, user._id);
     res.status(200).json({
-      message: 'OTP sent to your email',
-      requiresOTP: true,
-      userId: user._id
+      _id: userWithFollows._id,
+      name: userWithFollows.name,
+      username: userWithFollows.username,
+      email: userWithFollows.email,
+      bio: userWithFollows.bio,
+      profile: userWithFollows.profile,
+      following: userWithFollows.following,
+      darkMode: user.darkMode,
+      token,
     });
   } else {
     res.status(400);
