@@ -12,7 +12,34 @@ const userSchema = mongoose.Schema(
     password: { type: String, required: true },
     darkMode: {
       type: Boolean,
-      default: false, // Default to light mode
+      default: false,
+    },
+    // OTP Verification Fields
+    isVerified: {
+      type: Boolean,
+      default: false
+    },
+    otp: {
+      type: String,
+      default: null
+    },
+    otpExpires: {
+      type: Date,
+      default: null
+    },
+    authMethod: {
+      type: String,
+      enum: ['local', 'google', 'facebook'],
+      default: 'local'
+    },
+    // Social Auth Fields
+    googleId: {
+      type: String,
+      default: null
+    },
+    facebookId: {
+      type: String,
+      default: null
     },
     followers: [
       {

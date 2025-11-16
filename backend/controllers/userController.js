@@ -5,6 +5,7 @@ import generateToken from "../utils/generateToken.js";
 import { OAuth2Client } from "google-auth-library";
 import { processFacebookAuth } from "../services/facebookAuth.js";
 import DeleteAccount from '../models/deleteUserModel.js';
+import { generateOTP, sendOTP } from '../utils/otpService.js';
 
 // Initialize Google OAuth client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -184,30 +185,94 @@ const googleAuth = asyncHandler(async (req, res, next) => {
 //     });
 // });
 
+// In userController.js
+const verifyOTP = asyncHandler(async (req, res, next) => {
+  const { userId, otp } = req.body;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  if (user.otp !== otp) {
+    res.status(400);
+    throw new Error("Invalid OTP");
+  }
+
+  if (Date.now() > user.otpExpires) {
+    res.status(400);
+    throw new Error("OTP don expire. Request new one");
+  }
+
+  // OTP is valid - mark as verified and login
+  user.isVerified = true;
+  user.otp = undefined;
+  user.otpExpires = undefined;
+  await user.save();
+
+  const userWithFollows = await User.findById(user._id)
+    .select("-password")
+    .populate("following", "_id");
+
+  const token = generateToken(res, user._id);
+  res.status(200).json({
+    message: "Email verified successfully",
+    _id: userWithFollows._id,
+    name: userWithFollows.name,
+    username: userWithFollows.username,
+    email: userWithFollows.email,
+    bio: userWithFollows.bio,
+    profile: userWithFollows.profile,
+    following: userWithFollows.following || [],
+    darkMode: userWithFollows.darkMode || false,
+    isVerified: true,
+    token
+  });
+});
+
 //Login a new User
 const loginUser = asyncHandler(async (req, res, next) => {
   console.log("Login request received:", req.body);
-  const { username, email, password } = req.body;
+  const { email, password } = req.body;
 
   const user = await User.findOne({ email });
   console.log("User found:", user);
 
   if (user && (await user.matchPassword(password))) {
-    const userWithFollows = await User.findById(user._id)
-      .select("-password")
-      .populate("following", "_id");
-      
-    const token = generateToken(res, user._id);
+    // Skip OTP for social auth users
+    if (user.authMethod && user.authMethod !== 'local') {
+      const userWithFollows = await User.findById(user._id)
+        .select("-password")
+        .populate("following", "_id");
+        
+      const token = generateToken(res, user._id);
+      return res.status(200).json({
+        _id: userWithFollows._id,
+        name: userWithFollows.name,
+        username: userWithFollows.username,
+        email: userWithFollows.email,
+        bio: userWithFollows.bio,
+        profile: userWithFollows.profile,
+        following: userWithFollows.following,
+        darkMode: user.darkMode,
+        token,
+      });
+    }
+
+    // For local auth, always require OTP verification
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user.save();
+    
+    await sendOTP(email, otp);
+
     res.status(200).json({
-      _id: userWithFollows._id,
-      name: userWithFollows.name,
-      username: userWithFollows.username,
-      email: userWithFollows.email,
-      bio: userWithFollows.bio,
-      profile: userWithFollows.profile,
-      following: userWithFollows.following,
-      darkMode: user.darkMode,
-      token,
+      message: 'OTP sent to your email',
+      requiresOTP: true,
+      userId: user._id
     });
   } else {
     res.status(400);
@@ -234,21 +299,36 @@ const registerUser = asyncHandler(async (req, res, next) => {
     username,
     email,
     password,
+    authMethod: 'local',
+    isVerified: false
   });
 
   if (user) {
-    const userWithFollows = await User.findById(user._id)
+    // Generate and send OTP
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user.save();
+    
+    await sendOTP(email, otp);
+
+    // Get user with populated fields
+    const userWithDetails = await User.findById(user._id)
       .select("-password")
       .populate("following", "_id");
-      
-    const token = generateToken(res, user._id);
+
     res.status(201).json({
-      id: userWithFollows._id,
-      name: userWithFollows.name,
-      username: userWithFollows.username,
-      email: userWithFollows.email,
-      following: userWithFollows.following,
-      token,
+      message: 'OTP sent to your email for verification',
+      requiresOTP: true,
+      userId: userWithDetails._id,
+      id: userWithDetails._id,
+      name: userWithDetails.name,
+      username: userWithDetails.username,
+      email: userWithDetails.email,
+      bio: userWithDetails.bio,
+      profile: userWithDetails.profile,
+      following: userWithDetails.following || [],
+      darkMode: userWithDetails.darkMode || false
     });
   } else {
     res.status(400);
@@ -596,6 +676,7 @@ const getFollowStats = asyncHandler(async (req, res, next) => {
 
 export {
   googleAuth,
+  verifyOTP,
   loginUser,
   registerUser,
   updateDarkMode,

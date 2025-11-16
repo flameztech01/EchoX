@@ -31,6 +31,7 @@ import FollowingScreen from './screens/FollowingScreen.jsx';
 import ChangePassword from './screens/ChangePassword.jsx';
 import DeleteAccount from './screens/DeleteAccount.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
+import SendOtp from './screens/SendOtp.jsx';
 
 import Notfoundscreen from './screens/Notfoundscreen.jsx';
 import ThemeProvider from './components/ThemeProvider.jsx'; // Import ThemeProvider
@@ -42,6 +43,7 @@ const router = createBrowserRouter(
       <Route index element={<Welcome />} />
       <Route path="signup" element={<Signup />} />
       <Route path="signin" element={<Signin />} />
+      <Route path='verify-otp' element={<SendOtp />} />
       
       <Route element={<Privateroute />}>
         <Route path="postform" element={<Postform />} />

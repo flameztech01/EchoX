@@ -28,6 +28,14 @@ export const userApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    sendOtp: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/verify-otp`,
+        method: "POST",
+        body: data,
+      })
+    }),
+
     register: builder.mutation({
       query: (data) => ({
         url: `${USER_URL}/register`,
@@ -126,6 +134,7 @@ export const {
   useLoginMutation,
   useGoogleAuthMutation,
   useFacebookAuthMutation,
+  useSendOtpMutation,
   useRegisterMutation,
   useUpdateDarkModeMutation,
   useGetUserProfileQuery,

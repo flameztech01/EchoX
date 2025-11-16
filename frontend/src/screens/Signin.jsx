@@ -5,55 +5,62 @@ import {useDispatch} from 'react-redux'
 import {useNavigate} from 'react-router-dom'
 import {useLoginMutation} from '../slices/userApiSlice.js'
 import {toast} from 'react-toastify'
-import {useSelector} from 'react-redux'
-import {useState, useEffect} from 'react'
+import {useState} from 'react'
 import { useGoogleAuthMutation } from '../slices/userApiSlice.js'
 import { useGoogleLogin } from '@react-oauth/google';
+import SendOtp from './SendOtp.jsx'
 
 const Signin = () => {
-  const [loginUser, {isLoading, error}] = useLoginMutation();
+  const [loginUser, {isLoading}] = useLoginMutation();
   const [googleAuth] = useGoogleAuthMutation();
-  const userInfo = useSelector((state) => state.auth.userInfo);
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [requiresOTP, setRequiresOTP] = useState(false);
+  const [userId, setUserId] = useState('');
 
   const handleGoogleSignIn = useGoogleLogin({
-  onSuccess: async (tokenResponse) => {
-    try {
-      const response = await googleAuth({
-        token: tokenResponse.access_token // Send ID token instead of access token
-      }).unwrap();
-      
-      dispatch(setCredentials({...response}));
-      navigate('/home');
-      toast.success('Login Successful');
-    } catch (error) {
-      toast.error(error?.data?.message || 'Google login failed');
+    onSuccess: async (tokenResponse) => {
+      try {
+        const response = await googleAuth({
+          token: tokenResponse.access_token
+        }).unwrap();
+        
+        dispatch(setCredentials({...response}));
+        navigate('/home');
+        toast.success('Login Successful');
+      } catch (error) {
+        toast.error(error?.data?.message || 'Google login failed');
+      }
+    },
+    onError: () => {
+      toast.error('Google login failed');
     }
-  },
-  onError: () => {
-    toast.error('Google login failed');
-  }
-});
-
-  if(isLoading){
-    return <h2>Loading...</h2>
-  }
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await loginUser({email, password}).unwrap();
-      dispatch(setCredentials({...res}));
-      navigate('/home');
-      toast.success('Login Successful');
+      
+      if (res.requiresOTP) {
+        setRequiresOTP(true);
+        setUserId(res.userId);
+      } else {
+        dispatch(setCredentials({...res}));
+        navigate('/home');
+        toast.success('Login Successful');
+      }
     } catch (error) {
       toast.error(error?.data?.message || 'Login failed');
     }
+  }
+
+  if (requiresOTP) {
+    return <SendOtp userId={userId} email={email} />
   }
 
   return (
@@ -61,23 +68,27 @@ const Signin = () => {
       <form onSubmit={handleSubmit}>
           <img src="/logo.png" alt="" />
 
-           <input type="email" 
-          name="" 
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder='email'
-          id="" 
+          <input 
+            type="email" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder='email'
+            required
           />
 
-           <input type="password" 
-          name="" 
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder='password'
-          id="" 
+          <input 
+            type="password" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder='password'
+            required
           />
 
           <a href="">Forget Password</a>
 
-          <button type='submit'>Sign In</button>
+          <button type='submit' disabled={isLoading}>
+            {isLoading ? 'Signing In...' : 'Sign In'}
+          </button>
           
           <div className="signup_options">
             <button type="button" onClick={handleGoogleSignIn}>
