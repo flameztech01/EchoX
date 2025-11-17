@@ -2,6 +2,7 @@ import express from "express";
 import {
   googleAuth,
   verifyOTP,
+  resendOTP,
   loginUser,
   registerUser,
   updateDarkMode,
@@ -57,6 +58,7 @@ cloudinary.api
 
 router.post("/google", googleAuth);
 router.post('/verify-otp', verifyOTP);
+router.post('/resend-otp', resendOTP);
 router.post("/login", loginUser);
 router.post("/register", registerUser);
 router.put("/dark-mode", protect, updateDarkMode);

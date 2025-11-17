@@ -232,6 +232,33 @@ const verifyOTP = asyncHandler(async (req, res, next) => {
   });
 });
 
+// Resend OTP
+const resendOTP = asyncHandler(async (req, res, next) => {
+  const { userId } = req.body;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Generate new OTP and expiration
+  const otp = generateOTP();
+  user.otp = otp;
+  user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  user.isVerified = false;
+  
+  await user.save();
+
+  // Send new OTP email
+  await sendOTP(user.email, otp);
+
+  res.status(200).json({
+    message: "New OTP sent to your email"
+  });
+});
+
 //Login a new User
 const loginUser = asyncHandler(async (req, res, next) => {
   console.log("Login request received:", req.body);
@@ -241,45 +268,38 @@ const loginUser = asyncHandler(async (req, res, next) => {
   console.log("User found:", user);
 
   if (user && (await user.matchPassword(password))) {
-    // If user logged in manually (not social auth) and not verified
-    if (!user.authMethod && !user.isVerified) {
-      try {
-        const otp = generateOTP();
-        user.otp = otp;
-        user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
-        await user.save();
+    // Skip OTP for social auth users
+    if (user.authMethod && user.authMethod !== 'local') {
+      const userWithFollows = await User.findById(user._id)
+        .select("-password")
+        .populate("following", "_id");
         
-        await sendOTP(email, otp);
-        
-        return res.status(200).json({
-          message: 'OTP sent to your email',
-          requiresOTP: true,
-          userId: user._id
-        });
-      } catch (emailError) {
-        console.log('Email failed, proceeding without OTP:', emailError);
-        // If email fails, mark as verified and proceed
-        user.isVerified = true;
-        await user.save();
-      }
+      const token = generateToken(res, user._id);
+      return res.status(200).json({
+        _id: userWithFollows._id,
+        name: userWithFollows.name,
+        username: userWithFollows.username,
+        email: userWithFollows.email,
+        bio: userWithFollows.bio,
+        profile: userWithFollows.profile,
+        following: userWithFollows.following,
+        darkMode: user.darkMode,
+        token,
+      });
     }
 
-    // If verified or social auth, proceed with normal login
-    const userWithFollows = await User.findById(user._id)
-      .select("-password")
-      .populate("following", "_id");
-      
-    const token = generateToken(res, user._id);
+    // For local auth, always require OTP verification
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user.save();
+    
+    await sendOTP(email, otp);
+
     res.status(200).json({
-      _id: userWithFollows._id,
-      name: userWithFollows.name,
-      username: userWithFollows.username,
-      email: userWithFollows.email,
-      bio: userWithFollows.bio,
-      profile: userWithFollows.profile,
-      following: userWithFollows.following,
-      darkMode: user.darkMode,
-      token,
+      message: 'OTP sent to your email',
+      requiresOTP: true,
+      userId: user._id
     });
   } else {
     res.status(400);
@@ -684,6 +704,7 @@ const getFollowStats = asyncHandler(async (req, res, next) => {
 export {
   googleAuth,
   verifyOTP,
+  resendOTP,
   loginUser,
   registerUser,
   updateDarkMode,

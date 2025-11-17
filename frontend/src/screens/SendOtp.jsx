@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useSendOtpMutation } from '../slices/userApiSlice.js';
+import { useSendOtpMutation, useResendOtpMutation } from '../slices/userApiSlice.js';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -7,11 +7,12 @@ import { setCredentials } from '../slices/authSlice.js';
 
 const SendOtp = ({ userId, email }) => {
   const [sendOtp, { isLoading }] = useSendOtpMutation();
+  const [resendOtp, { isLoading: isResending }] = useResendOtpMutation(); // Add this
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timeLeft, setTimeLeft] = useState(60);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // Add this
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -68,7 +69,6 @@ const SendOtp = ({ userId, email }) => {
       console.log('OTP Response:', result);
       
       if (result.token) {
-        // Add this line to store credentials in Redux
         dispatch(setCredentials({...result}));
         toast.success('Email verified successfully!');
         navigate('/home');
@@ -84,13 +84,13 @@ const SendOtp = ({ userId, email }) => {
 
   const handleResendOtp = async () => {
     try {
-      await sendOtp({ userId }).unwrap();
+      await resendOtp({ userId }).unwrap(); // Use resendOtp instead of sendOtp
       setTimeLeft(60);
       setOtp(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
       toast.success('New OTP sent to your email');
     } catch (error) {
-      toast.error('Failed to resend OTP. Please try again.');
+      toast.error(error?.data?.message || 'Failed to resend OTP. Please try again.');
     }
   };
 
@@ -139,10 +139,10 @@ const SendOtp = ({ userId, email }) => {
               <button
                 type="button"
                 onClick={handleResendOtp}
-                disabled={isLoading}
+                disabled={isResending} // Use isResending instead of isLoading
                 className="otp-resend-btn"
               >
-                Resend OTP
+                {isResending ? 'Sending...' : 'Resend OTP'}
               </button>
             )}
           </p>
