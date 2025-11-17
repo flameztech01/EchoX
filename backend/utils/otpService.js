@@ -16,7 +16,7 @@ export const sendOTP = async (email, otp) => {
     console.log("=== SENDING OTP VIA RESEND ===");
 
     const data = await resend.emails.send({
-      from: "EchoX <noreply@resend.dev>",
+      from: process.send.EMAIL_USER,
       to: email,
       subject: "Your OTP Code",
       html: `
