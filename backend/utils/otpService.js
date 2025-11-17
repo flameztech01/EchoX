@@ -1,62 +1,40 @@
-// utils/otpService.js
-import nodemailer from 'nodemailer';
+// utils/sendOTP.js
 
-const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
+import { Resend } from "resend";
 
-const sendOTP = async (email, otp) => {
+// Initialize Resend client using environment variable
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Generate random 6-digit OTP
+export const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Send OTP email using Resend
+export const sendOTP = async (email, otp) => {
   try {
-    console.log('=== PRODUCTION OTP SEND ===');
-    console.log('To:', email);
-    console.log('OTP:', otp);
-    console.log('Gmail User:', process.env.EMAIL_USER);
-    
-    // Remove any spaces from password
-    const emailPass = process.env.EMAIL_PASS.replace(/\s+/g, '');
-    
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: emailPass,
-      },
-      // Production settings
-      pool: true,
-      maxConnections: 1,
-      rateDelta: 20000,
-      rateLimit: 5
+    console.log("=== SENDING OTP VIA RESEND ===");
+
+    const data = await resend.emails.send({
+      from: "EchoX <noreply@resend.dev>",
+      to: email,
+      subject: "Your OTP Code",
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>Your OTP Code</h2>
+          <p>Your verification code is:</p>
+          <h1 style="color:#4F46E5; font-size: 32px;">${otp}</h1>
+          <p>This code will expire in 10 minutes.</p>
+        </div>
+      `,
     });
 
-    const mailOptions = {
-      from: `EchoX <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: 'Your EchoX Verification Code',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-          <h2>EchoX Verification Code</h2>
-          <p>Your OTP code is: <strong style="font-size: 24px; color: #2563eb;">${otp}</strong></p>
-          <p>This code will expire in 10 minutes.</p>
-          <hr>
-          <p style="color: #6b7280; font-size: 12px;">If you didn't request this code, please ignore this email.</p>
-        </div>
-      `
-    };
+    console.log("=== OTP SENT SUCCESSFULLY ===");
+    return data;
 
-    await transporter.sendMail(mailOptions);
-    console.log('=== OTP SENT SUCCESSFULLY ===');
-    
   } catch (error) {
-    console.error('=== GMAIL OTP FAILED ===');
-    console.error('Error:', error.message);
-    
-    // More specific error messages
-    if (error.code === 'EAUTH') {
-      throw new Error('Email authentication failed. Check your Gmail app password.');
-    } else if (error.code === 'ECONNECTION') {
-      throw new Error('Cannot connect to Gmail. Check your network connection.');
-    } else {
-      throw new Error(`Failed to send OTP: ${error.message}`);
-    }
+    console.error("❌ OTP EMAIL FAILED:", error);
+    throw new Error("Failed to send OTP email");
   }
 };
 
-export { generateOTP, sendOTP };
