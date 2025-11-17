@@ -16,7 +16,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/echox';
 const allowedOrigins = process.env.NODE_ENV === 'production' 
-    ? ['https://echox-wzh0.onrender.com']
+    ? ['https://echox.site']
     : ['http://localhost:3000', 'https://echox-wzh0.onrender.com'];
 
 // Middleware
