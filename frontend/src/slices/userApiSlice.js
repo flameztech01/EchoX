@@ -90,6 +90,39 @@ updateDarkMode: builder.mutation({
       }),
     }),
 
+    // In your userApiSlice.js
+forgotPassword: builder.mutation({
+  query: (data) => ({
+    url: `${USER_URL}/forgot-password`,
+    method: "POST",
+    body: data
+  })
+}),
+
+verifyResetOTP: builder.mutation({
+  query: (data) => ({
+    url: `${USER_URL}/verify-reset-otp`,
+    method: "POST",
+    body: data
+  })
+}),
+
+resetPassword: builder.mutation({
+  query: (data) => ({
+    url: `${USER_URL}/reset-password`,
+    method: "POST",
+    body: data
+  })
+}),
+
+resendResetOTP: builder.mutation({
+  query: (data) => ({
+    url: `${USER_URL}/resend-reset-otp`,
+    method: "POST",
+    body: data
+  })
+}),
+
     // Delete User
     // In userApiSlice.js - add this to endpoints
     deleteUser: builder.mutation({
@@ -150,6 +183,11 @@ export const {
   useGetOneUserProfileQuery,
   useUpdateProfileMutation,
   useLogoutUserMutation,
+  useForgotPasswordMutation,
+  useResetOTPMutation,
+  useResetPasswordMutation,
+  useVerifyResetOTPMutation,
+  useResendResetOTPMutation,
   useDeleteUserMutation,
   useFollowUserMutation,
   useUnfollowUserMutation,

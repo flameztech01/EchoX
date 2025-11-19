@@ -2675,9 +2675,13 @@ button:disabled {
   background: var(--input-bg);
   border: 2px solid var(--border-color);
   border-radius: 12px;
-  color: var(--text-primary);
+  color: var(--text-primary); /* This ensures text is white in dark mode and dark in light mode */
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.otp-input::placeholder {
+  color: var(--text-tertiary); /* Placeholder color adapts to theme */
 }
 
 .otp-input:focus {
@@ -2685,10 +2689,12 @@ button:disabled {
   outline: none;
   box-shadow: 0 0 0 3px rgba(30, 161, 217, 0.2), 0 2px 8px var(--shadow-color);
   transform: translateY(-2px);
+  color: var(--text-primary); /* Ensure text color stays consistent on focus */
 }
 
 .otp-input.filled {
   border-color: #1EA1D9;
+  color: var(--text-primary); /* Text color for filled inputs */
 }
 
 .otp-verify-btn {
@@ -2712,6 +2718,7 @@ button:disabled {
 
 .otp-verify-btn:disabled {
   background: var(--border-color);
+  color: var(--text-secondary);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -2721,11 +2728,11 @@ button:disabled {
 .otp-resend-container {
   text-align: center;
   margin-top: 20px;
-  color: var(--text-secondary);
 }
 
 .otp-resend-text {
   margin-bottom: 15px;
+  color: var(--text-secondary);
 }
 
 .otp-resend-btn {
@@ -2736,6 +2743,7 @@ button:disabled {
   font-weight: 600;
   text-decoration: underline;
   transition: color 0.3s ease;
+  font-size: inherit;
 }
 
 .otp-resend-btn:hover:not(:disabled) {
@@ -2749,6 +2757,7 @@ button:disabled {
 
 .otp-timer {
   color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .otp-note {

@@ -484,6 +484,142 @@ const logoutUser = asyncHandler(async (req, res, next) => {
   res.status(200).json("You don log out. Do quick come back sha");
 });
 
+// Forgot Password - Request OTP
+const forgotPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  if (!email) {
+    res.status(400);
+    throw new Error("Email dey required");
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error("No user dey with this email");
+  }
+
+  // Generate OTP and set expiration (10 minutes)
+  const otp = generateOTP();
+  user.otp = otp;
+  user.otpExpires = Date.now() + 10 * 60 * 1000;
+  await user.save();
+
+  // Send OTP to email
+  await sendOTP(email, otp);
+
+  res.status(200).json({
+    message: "OTP don send to your email",
+    userId: user._id
+  });
+});
+
+// Verify OTP for Password Reset
+const verifyResetOTP = asyncHandler(async (req, res, next) => {
+  const { userId, otp } = req.body;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User no dey here");
+  }
+
+  if (user.otp !== otp) {
+    res.status(400);
+    throw new Error("Invalid OTP");
+  }
+
+  if (Date.now() > user.otpExpires) {
+    res.status(400);
+    throw new Error("OTP don expire. Request new one");
+  }
+
+  // OTP is valid - clear OTP and generate reset token
+  user.otp = undefined;
+  user.otpExpires = undefined;
+  user.resetPasswordToken = generateToken(res, user._id); // Reusing your token generator
+  user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
+  await user.save();
+
+  res.status(200).json({
+    message: "OTP correct. You fit change your password now",
+    resetToken: user.resetPasswordToken,
+    userId: user._id
+  });
+});
+
+// Reset Password
+const resetPassword = asyncHandler(async (req, res, next) => {
+  const { userId, newPassword, confirmPassword, resetToken } = req.body;
+
+  if (!newPassword || !confirmPassword) {
+    res.status(400);
+    throw new Error("Password and confirm password dey required");
+  }
+
+  if (newPassword !== confirmPassword) {
+    res.status(400);
+    throw new Error("Passwords no match");
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User no dey here");
+  }
+
+  // Verify reset token
+  if (!user.resetPasswordToken || user.resetPasswordToken !== resetToken) {
+    res.status(400);
+    throw new Error("Invalid or expired reset token");
+  }
+
+  if (Date.now() > user.resetPasswordExpires) {
+    res.status(400);
+    throw new Error("Reset token don expire. Start over");
+  }
+
+  // Update password and clear reset token
+  user.password = newPassword;
+  user.otp = undefined;
+  user.otpExpires = undefined;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  res.status(200).json({
+    message: "Password don change successfully. You fit login now"
+  });
+});
+
+// Resend Reset OTP
+const resendResetOTP = asyncHandler(async (req, res, next) => {
+  const { userId } = req.body;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User no dey here");
+  }
+
+  // Generate new OTP
+  const otp = generateOTP();
+  user.otp = otp;
+  user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  await user.save();
+
+  // Send new OTP
+  await sendOTP(user.email, otp);
+
+  res.status(200).json({
+    message: "New OTP don send to your email"
+  });
+});
+
 // Delete User
 const deleteUser = asyncHandler(async (req, res, next) => {
   const { reason, password } = req.body;
@@ -712,6 +848,10 @@ export {
   getAnyUserProfile,
   updateProfile,
   logoutUser,
+   forgotPassword,           // Add this
+  verifyResetOTP,           // Add this
+  resetPassword,            // Add this
+  resendResetOTP,         // Add this
   deleteUser,
   followUser,
   unfollowUser,

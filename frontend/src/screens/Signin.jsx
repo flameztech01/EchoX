@@ -84,7 +84,7 @@ const Signin = () => {
             required
           />
 
-          <a href="">Forget Password</a>
+          <Link to="/forgot-password">Forget Password</Link>
 
           <button type='submit' disabled={isLoading}>
             {isLoading ? 'Signing In...' : 'Sign In'}
