@@ -33,7 +33,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         url: `${USER_URL}/verify-otp`,
         method: "POST",
         body: data,
-      })
+      }),
     }),
 
     resendOtp: builder.mutation({
@@ -41,7 +41,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         url: `${USER_URL}/resend-otp`,
         method: "POST",
         body: data,
-      })
+      }),
     }),
 
     register: builder.mutation({
@@ -53,13 +53,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
     }),
 
     // Add this mutation
-updateDarkMode: builder.mutation({
-  query: (data) => ({
-    url: `${USER_URL}/dark-mode`,
-    method: "PUT",
-    body: data,
-  }),
-}),
+    updateDarkMode: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/dark-mode`,
+        method: "PUT",
+        body: data,
+      }),
+    }),
 
     getUserProfile: builder.query({
       query: () => ({
@@ -91,37 +91,37 @@ updateDarkMode: builder.mutation({
     }),
 
     // In your userApiSlice.js
-forgotPassword: builder.mutation({
-  query: (data) => ({
-    url: `${USER_URL}/forgot-password`,
-    method: "POST",
-    body: data
-  })
-}),
+    forgotPassword: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/forgot-password`,
+        method: "POST",
+        body: data,
+      }),
+    }),
 
-verifyResetOTP: builder.mutation({
-  query: (data) => ({
-    url: `${USER_URL}/verify-reset-otp`,
-    method: "POST",
-    body: data
-  })
-}),
+    verifyResetOTP: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/verify-reset-otp`,
+        method: "POST",
+        body: data,
+      }),
+    }),
 
-resetPassword: builder.mutation({
-  query: (data) => ({
-    url: `${USER_URL}/reset-password`,
-    method: "POST",
-    body: data
-  })
-}),
+    resetPassword: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/reset-password`,
+        method: "POST",
+        body: data,
+      }),
+    }),
 
-resendResetOTP: builder.mutation({
-  query: (data) => ({
-    url: `${USER_URL}/resend-reset-otp`,
-    method: "POST",
-    body: data
-  })
-}),
+    resendResetOTP: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/resend-reset-otp`,
+        method: "POST",
+        body: data,
+      }),
+    }),
 
     // Delete User
     // In userApiSlice.js - add this to endpoints
@@ -168,6 +168,15 @@ resendResetOTP: builder.mutation({
         method: "GET",
       }),
     }),
+
+    // In your userApiSlice.js
+    search: builder.query({
+      query: ({ query, type = "all", page = 1, limit = 10 }) => ({
+        url: `${USER_URL}/search`,
+        params: { query, type, page, limit },
+      }),
+      providesTags: ["Search"],
+    }),
   }),
 });
 
@@ -194,4 +203,5 @@ export const {
   useGetFollowersQuery,
   useGetFollowingQuery,
   useGetFollowStatsQuery,
+  useSearchQuery,
 } = userApiSlice;

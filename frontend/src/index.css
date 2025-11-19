@@ -2829,3 +2829,648 @@ button:disabled {
     font-size: 13px;
   }
 }
+
+
+
+
+/* Search Screen Styles - Updated to match ViewPosts & Followers */
+.search-container {
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  padding: 20px;
+  padding-top: 80px;
+  padding-bottom: 100px;
+}
+
+.search-header {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(139, 51, 187, 0.3);
+  margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  border: 1px solid var(--border-color);
+}
+
+.search-header input {
+  flex: 1;
+  padding: 14px 20px;
+  background: var(--input-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 16px;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.search-header input:focus {
+  border-color: #1EA1D9;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 161, 217, 0.2);
+  transform: translateY(-2px);
+}
+
+.search-header input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.search-header select {
+  padding: 14px 20px;
+  background: var(--input-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 16px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  min-width: 120px;
+}
+
+.search-header select:focus {
+  border-color: #1EA1D9;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 161, 217, 0.2);
+}
+
+.search-loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-size: 16px;
+  background: var(--card-bg);
+  border-radius: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Users Section - Matching Followers Screen */
+.users-section {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 10px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.users-section h3 {
+  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 600;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.users-section h3::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(135deg, #1EA1D9, #8B33BB);
+  margin-top: 8px;
+  border-radius: 2px;
+}
+
+/* User Result Cards - Matching Follower Cards */
+.user-result {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px var(--shadow-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+  margin-bottom: 12px;
+}
+
+.user-result:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.user-result:last-child {
+  margin-bottom: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 3px solid var(--border-color);
+  border-radius: 50%;
+  transition: border-color 0.3s ease;
+}
+
+.user-avatar:hover img {
+  border-color: #1EA1D9;
+}
+
+.user-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.user-name:hover {
+  color: #1EA1D9;
+}
+
+.user-username {
+  color: #1EA1D9;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.user-bio {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.user-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.follow-btn, .unfollow-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.follow-btn {
+  background: linear-gradient(135deg, #1EA1D9, #8B33BB);
+  color: white;
+  box-shadow: 0 2px 8px rgba(30, 161, 217, 0.3);
+}
+
+.follow-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(30, 161, 217, 0.4);
+}
+
+.unfollow-btn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.unfollow-btn:hover {
+  background: var(--hover-color);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+/* Posts Section - Matching ViewPosts */
+.posts-section {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 10px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.posts-section h3 {
+  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 600;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.posts-section h3::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(135deg, #1EA1D9, #8B33BB);
+  margin-top: 8px;
+  border-radius: 2px;
+}
+
+/* Post Result Cards - Matching ViewPosts .high */
+.post-result {
+  background: var(--card-bg);
+  padding: 15px;
+  margin-bottom: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  box-shadow: 0 4px 12px rgba(139, 51, 187, 0.3);
+  border-radius: 15px;
+  border: 1px solid var(--border-color);
+}
+
+.post-result:last-child {
+  margin-bottom: 0;
+}
+
+.post-profile-side {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.post-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.post-profile img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-color);
+  transition: border-color 0.3s ease;
+}
+
+.post-profile img:hover {
+  border-color: #1EA1D9;
+}
+
+.post-profile a {
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.post-profile a:hover {
+  color: #1EA1D9;
+}
+
+.post-follow button {
+  padding: 6px 16px;
+  background: #0095F6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.post-follow button:hover {
+  background: #1877F2;
+  transform: translateY(-1px);
+}
+
+.post-follow button.following {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.post-content {
+  padding: 16px 20px;
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 400;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.post-image {
+  width: 100%;
+  max-height: 600px;
+  object-fit: cover;
+  background: var(--bg-secondary);
+  display: block;
+  transition: opacity 0.3s ease;
+  border-radius: 15px;
+}
+
+.post-image:hover {
+  opacity: 0.95;
+}
+
+.post-actions {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.action-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.likes-count {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.likes-count p {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.likes-count a {
+  text-decoration: none;
+  color: var(--text-secondary);
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--card-bg);
+  border-radius: 16px;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.no-results::before {
+  content: "🔍";
+  font-size: 48px;
+  display: block;
+  margin-bottom: 20px;
+  opacity: 0.7;
+}
+
+/* Loading Animation */
+.search-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 40px 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color);
+  border-top: 4px solid #1EA1D9;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Search Error State */
+.search-error {
+  background: #fee;
+  color: #c33;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid #fcc;
+  margin-bottom: 20px;
+}
+
+/* Search Hint */
+.search-hint {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-tertiary);
+  font-style: italic;
+  background: var(--card-bg);
+  border-radius: 16px;
+  border: 2px dashed var(--border-color);
+}
+
+/* Responsive Design */
+@media (max-width: 780px) {
+  .search-container {
+    padding: 15px;
+    padding-top: 70px;
+    padding-bottom: 90px;
+  }
+  
+  .search-header {
+    padding: 15px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .search-header input,
+  .search-header select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+  
+  .users-section, .posts-section {
+    padding: 15px;
+    border-radius: 12px;
+  }
+  
+  .user-result {
+    padding: 15px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .user-info {
+    width: 100%;
+  }
+  
+  .user-avatar {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .user-name {
+    font-size: 15px;
+  }
+  
+  .user-username {
+    font-size: 13px;
+  }
+  
+  .user-bio {
+    font-size: 13px;
+  }
+  
+  .user-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .follow-btn, .unfollow-btn {
+    padding: 8px 20px;
+    font-size: 13px;
+    min-width: 90px;
+    height: 36px;
+  }
+  
+  .post-result {
+    margin: 10px;
+    margin-bottom: 0px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-container {
+    padding: 10px;
+    padding-top: 70px;
+    padding-bottom: 80px;
+  }
+  
+  .search-header {
+    padding: 12px;
+    border-radius: 12px;
+  }
+  
+  .users-section, .posts-section {
+    padding: 12px;
+    border-radius: 10px;
+  }
+  
+  .no-results {
+    padding: 30px 12px;
+  }
+  
+  .no-results::before {
+    font-size: 32px;
+    margin-bottom: 15px;
+  }
+}
+
+/* Image expansion styles for search posts */
+.post-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  cursor: pointer;
+  background: var(--bg-secondary);
+  display: block;
+  transition: opacity 0.3s ease;
+  border-radius: 15px;
+}
+
+.post-image.expanded {
+  max-height: none;
+  object-fit: contain;
+}
+
+/* Loading state for images */
+.post-image.loading {
+  opacity: 0.7;
+}
+
+/* Ensure the expanded image doesn't break layout */
+@media (max-width: 780px) {
+  .post-image {
+    max-height: 300px;
+  }
+  
+  .post-image.expanded {
+    max-height: 70vh;
+  }
+}
+
+/* Update search container to account for the new header */
+.search-container {
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  padding: 20px;
+  padding-top: 20px; /* Reduced from 80px since we have SearchNav now */
+  padding-bottom: 100px;
+}
+
+/* Ensure SearchNav matches postform_header styling */
+.postform_header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-bg);
+  margin: -20px -20px 20px -20px; /* Negative margins to stretch full width */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.postform_header a {
+  color: #1EA1D9;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.postform_header a:hover {
+  background: #1EA1D9;
+  color: white;
+}
+
+.postform_header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 600;
+}

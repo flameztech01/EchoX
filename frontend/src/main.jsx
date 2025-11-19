@@ -37,6 +37,8 @@ import ForgotPassword from './screens/ForgotPassword.jsx';
 import SendPasswordOtp from './screens/SendPasswordOtp.jsx';
 import ResetPassword from './screens/ResetPassword.jsx';
 
+import Search from './screens/Search.jsx';
+
 import Notfoundscreen from './screens/Notfoundscreen.jsx';
 import ThemeProvider from './components/ThemeProvider.jsx'; // Import ThemeProvider
 
@@ -67,6 +69,8 @@ const router = createBrowserRouter(
         <Route path='change-password' element={<ChangePassword />} />
         <Route path='delete-account' element={<DeleteAccount />} />
         <Route path='settings' element={<SettingsScreen />}  />
+
+        <Route path='search' element={<Search />} />
       </Route>
       
       {/* Add explicit 404 route that doesn't interfere with static files */}

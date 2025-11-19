@@ -4,8 +4,10 @@ import asyncHandler from "express-async-handler";
 import generateToken from "../utils/generateToken.js";
 import { OAuth2Client } from "google-auth-library";
 import { processFacebookAuth } from "../services/facebookAuth.js";
-import DeleteAccount from '../models/deleteUserModel.js';
-import { generateOTP, sendOTP } from '../utils/otpService.js';
+import DeleteAccount from "../models/deleteUserModel.js";
+import { generateOTP, sendOTP } from "../utils/otpService.js";
+import Post from "../models/postModel.js";
+import Comment from "../models/commentModel.js"
 
 // Initialize Google OAuth client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -228,7 +230,7 @@ const verifyOTP = asyncHandler(async (req, res, next) => {
     following: userWithFollows.following || [],
     darkMode: userWithFollows.darkMode || false,
     isVerified: true,
-    token
+    token,
   });
 });
 
@@ -248,14 +250,14 @@ const resendOTP = asyncHandler(async (req, res, next) => {
   user.otp = otp;
   user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
   user.isVerified = false;
-  
+
   await user.save();
 
   // Send new OTP email
   await sendOTP(user.email, otp);
 
   res.status(200).json({
-    message: "New OTP sent to your email"
+    message: "New OTP sent to your email",
   });
 });
 
@@ -269,11 +271,11 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
   if (user && (await user.matchPassword(password))) {
     // Skip OTP for social auth users
-    if (user.authMethod && user.authMethod !== 'local') {
+    if (user.authMethod && user.authMethod !== "local") {
       const userWithFollows = await User.findById(user._id)
         .select("-password")
         .populate("following", "_id");
-        
+
       const token = generateToken(res, user._id);
       return res.status(200).json({
         _id: userWithFollows._id,
@@ -293,13 +295,13 @@ const loginUser = asyncHandler(async (req, res, next) => {
     user.otp = otp;
     user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
     await user.save();
-    
+
     await sendOTP(email, otp);
 
     res.status(200).json({
-      message: 'OTP sent to your email',
+      message: "OTP sent to your email",
       requiresOTP: true,
-      userId: user._id
+      userId: user._id,
     });
   } else {
     res.status(400);
@@ -326,8 +328,8 @@ const registerUser = asyncHandler(async (req, res, next) => {
     username,
     email,
     password,
-    authMethod: 'local',
-    isVerified: false
+    authMethod: "local",
+    isVerified: false,
   });
 
   if (user) {
@@ -336,7 +338,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     user.otp = otp;
     user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
     await user.save();
-    
+
     await sendOTP(email, otp);
 
     // Get user with populated fields
@@ -345,7 +347,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
       .populate("following", "_id");
 
     res.status(201).json({
-      message: 'OTP sent to your email for verification',
+      message: "OTP sent to your email for verification",
       requiresOTP: true,
       userId: userWithDetails._id,
       id: userWithDetails._id,
@@ -355,7 +357,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
       bio: userWithDetails.bio,
       profile: userWithDetails.profile,
       following: userWithDetails.following || [],
-      darkMode: userWithDetails.darkMode || false
+      darkMode: userWithDetails.darkMode || false,
     });
   } else {
     res.status(400);
@@ -366,34 +368,33 @@ const registerUser = asyncHandler(async (req, res, next) => {
 // Update dark mode preference
 const updateDarkMode = asyncHandler(async (req, res, next) => {
   const { darkMode } = req.body;
-  
+
   const user = await User.findById(req.user._id);
-  
+
   if (!user) {
     res.status(404);
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 
   user.darkMode = darkMode;
   await user.save();
 
   res.status(200).json({
-    message: 'Theme preference updated successfully',
-    darkMode: user.darkMode
+    message: "Theme preference updated successfully",
+    darkMode: user.darkMode,
   });
 });
-
 
 //Get User Profile
 //Get User Profile - FIX THIS TOO
 const getUserProfile = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user._id)
-    .select('-password')
-    .populate('following', '_id');
+    .select("-password")
+    .populate("following", "_id");
 
   if (!user) {
     res.status(404);
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 
   res.status(200).json({
@@ -511,12 +512,12 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     message: "OTP don send to your email",
-    userId: user._id
+    userId: user._id,
   });
 });
 
 // Verify OTP for Password Reset
-import crypto from 'crypto';
+import crypto from "crypto";
 
 // Verify OTP for Password Reset
 const verifyResetOTP = asyncHandler(async (req, res, next) => {
@@ -540,8 +541,8 @@ const verifyResetOTP = asyncHandler(async (req, res, next) => {
   }
 
   // OTP is valid - generate a simple random token
-  const resetToken = crypto.randomBytes(20).toString('hex');
-  
+  const resetToken = crypto.randomBytes(20).toString("hex");
+
   // Clear OTP and set reset token
   user.otp = undefined;
   user.otpExpires = undefined;
@@ -552,7 +553,7 @@ const verifyResetOTP = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     message: "OTP correct. You fit change your password now",
     resetToken: resetToken,
-    userId: user._id
+    userId: user._id,
   });
 });
 
@@ -597,7 +598,7 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   await user.save();
 
   res.status(200).json({
-    message: "Password don change successfully. You fit login now"
+    message: "Password don change successfully. You fit login now",
   });
 });
 
@@ -622,7 +623,7 @@ const resendResetOTP = asyncHandler(async (req, res, next) => {
   await sendOTP(user.email, otp);
 
   res.status(200).json({
-    message: "New OTP don send to your email"
+    message: "New OTP don send to your email",
   });
 });
 
@@ -639,7 +640,9 @@ const deleteUser = asyncHandler(async (req, res, next) => {
   // Verify password before deletion
   if (!(await user.matchPassword(password))) {
     res.status(400);
-    throw new Error("Password no correct. You no fit delete account with wrong password.");
+    throw new Error(
+      "Password no correct. You no fit delete account with wrong password."
+    );
   }
 
   // Save deletion reason to database
@@ -647,20 +650,20 @@ const deleteUser = asyncHandler(async (req, res, next) => {
     user: user._id,
     reason: reason,
     email: user.email,
-    username: user.username
+    username: user.username,
   });
 
   // Delete the user
   await User.findByIdAndDelete(req.user._id);
-  
+
   // Clear the cookie
   res.cookie("jwt", "", {
     httpOnly: true,
     expires: new Date(0),
   });
-  
-  res.status(200).json({ 
-    message: "Your account don delete successfully. We go miss you!" 
+
+  res.status(200).json({
+    message: "Your account don delete successfully. We go miss you!",
   });
 });
 
@@ -772,14 +775,14 @@ const getFollowers = asyncHandler(async (req, res, next) => {
   }
 
   // Get current user's following list to check mutual follows
-  const currentUser = await User.findById(req.user._id).select('following');
-  
+  const currentUser = await User.findById(req.user._id).select("following");
+
   // Add mutual follow info to each follower
-  const followersWithMutualInfo = user.followers.map(follower => {
+  const followersWithMutualInfo = user.followers.map((follower) => {
     const isMutualFollow = currentUser.following.includes(follower._id);
     return {
       ...follower.toObject(),
-      isMutualFollow
+      isMutualFollow,
     };
   });
 
@@ -805,14 +808,14 @@ const getFollowing = asyncHandler(async (req, res, next) => {
   }
 
   // Get current user's following list to check mutual follows
-  const currentUser = await User.findById(req.user._id).select('following');
-  
+  const currentUser = await User.findById(req.user._id).select("following");
+
   // Add mutual follow info to each followed user
-  const followingWithMutualInfo = user.following.map(followedUser => {
+  const followingWithMutualInfo = user.following.map((followedUser) => {
     const isMutualFollow = followedUser.followers.includes(req.user._id);
     return {
       ...followedUser.toObject(),
-      isMutualFollow
+      isMutualFollow,
     };
   });
 
@@ -843,6 +846,95 @@ const getFollowStats = asyncHandler(async (req, res, next) => {
   });
 });
 
+// Search users and posts
+const search = asyncHandler(async (req, res, next) => {
+  const { query, type = "all", page = 1, limit = 10 } = req.query;
+
+  console.log("🔍 Search Request:", { query, type, page, limit });
+
+  // Validate query parameter
+  if (!query || query.trim().length < 2) {
+    res.status(400);
+    throw new Error("Search query must be at least 2 characters");
+  }
+
+  const searchQuery = query.trim();
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+
+  console.log("🔍 Processing search for:", searchQuery);
+
+  let results = {
+    users: [],
+    posts: [],
+    usersCount: 0,
+    postsCount: 0,
+    query: searchQuery,
+    type,
+    page: parseInt(page),
+    limit: parseInt(limit),
+  };
+
+  // Search users
+  if (type === "all" || type === "users") {
+    console.log("🔍 Searching users...");
+
+    const users = await User.find({
+      $or: [
+        { name: { $regex: searchQuery, $options: "i" } },
+        { username: { $regex: searchQuery, $options: "i" } },
+        { bio: { $regex: searchQuery, $options: "i" } },
+      ],
+    })
+      .select("name username profile bio followers following createdAt")
+      .limit(parseInt(limit))
+      .skip(skip);
+
+    console.log(`✅ Found ${users.length} users`);
+
+    results.users = users;
+    results.usersCount = users.length;
+  }
+
+  // Search posts - FIXED FIELD NAMES
+  if (type === "all" || type === "posts") {
+    console.log("🔍 Searching posts...");
+
+    // In your search function - update the post search part
+    const posts = await Post.find({
+      $or: [
+        { text: { $regex: searchQuery, $options: "i" } },
+        { hashtag: { $regex: searchQuery, $options: "i" } }, // Changed from 'hashtags' to 'hashtag'
+      ],
+    })
+      .populate("user", "name username profile")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "user",
+          select: "name username profile",
+        },
+      })
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip(skip);
+
+    console.log(`✅ Found ${posts.length} posts`);
+
+    results.posts = posts;
+    results.postsCount = posts.length;
+  }
+
+  console.log("🎉 Search completed:", {
+    usersFound: results.usersCount,
+    postsFound: results.postsCount,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: results,
+  });
+});
+
 export {
   googleAuth,
   verifyOTP,
@@ -854,14 +946,15 @@ export {
   getAnyUserProfile,
   updateProfile,
   logoutUser,
-   forgotPassword,           // Add this
-  verifyResetOTP,           // Add this
-  resetPassword,            // Add this
-  resendResetOTP,         // Add this
+  forgotPassword, // Add this
+  verifyResetOTP, // Add this
+  resetPassword, // Add this
+  resendResetOTP, // Add this
   deleteUser,
   followUser,
   unfollowUser,
   getFollowers,
   getFollowing,
   getFollowStats,
+  search,
 };

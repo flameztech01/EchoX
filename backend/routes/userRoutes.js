@@ -20,6 +20,7 @@ import {
   getFollowers,
   getFollowing,
   getFollowStats,
+  search
 } from "../controllers/userController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import multer from "multer";
@@ -94,5 +95,7 @@ router.get("/following/:id", protect, getFollowing); // specific user
 
 router.get("/follow-stats", protect, getFollowStats); // current user
 router.get("/follow-stats/:id", protect, getFollowStats); // specific user
+
+router.get('/search', protect, search);
 
 export default router;
