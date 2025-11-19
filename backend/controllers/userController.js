@@ -516,6 +516,9 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
 });
 
 // Verify OTP for Password Reset
+import crypto from 'crypto';
+
+// Verify OTP for Password Reset
 const verifyResetOTP = asyncHandler(async (req, res, next) => {
   const { userId, otp } = req.body;
 
@@ -536,16 +539,19 @@ const verifyResetOTP = asyncHandler(async (req, res, next) => {
     throw new Error("OTP don expire. Request new one");
   }
 
-  // OTP is valid - clear OTP and generate reset token
+  // OTP is valid - generate a simple random token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+  
+  // Clear OTP and set reset token
   user.otp = undefined;
   user.otpExpires = undefined;
-  user.resetPasswordToken = generateToken(res, user._id); // Reusing your token generator
+  user.resetPasswordToken = resetToken;
   user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
   await user.save();
 
   res.status(200).json({
     message: "OTP correct. You fit change your password now",
-    resetToken: user.resetPasswordToken,
+    resetToken: resetToken,
     userId: user._id
   });
 });

@@ -27,6 +27,15 @@ const userSchema = mongoose.Schema(
       type: Date,
       default: null
     },
+    // Password Reset Fields - ADD THESE
+    resetPasswordToken: {
+      type: String,
+      default: null
+    },
+    resetPasswordExpires: {
+      type: Date,
+      default: null
+    },
     authMethod: {
       type: String,
       enum: ['local', 'google', 'facebook'],
