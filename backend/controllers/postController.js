@@ -1,7 +1,7 @@
 import express from 'express';
 import Post from '../models/postModel.js';
 import asyncHandler from 'express-async-handler';
-import User from '../models/userModel.js';
+import User from '../models/userModel.js'
 
 //Create post 
 const createPost = asyncHandler(async (req, res, next) => {
@@ -32,118 +32,68 @@ const createPost = asyncHandler(async (req, res, next) => {
     });
 });
 
-//Get all posts with advanced personalized feed
-const getPosts = asyncHandler(async (req, res, next) => {
-  try {
-    const currentUserId = req.user?._id;
-    
-    let userFollowing = [];
-    let userLikedPosts = [];
-    
-    if (currentUserId) {
-      const currentUser = await User.findById(currentUserId)
-        .select('following')
-        .populate('following', '_id');
-      
-      userFollowing = currentUser?.following?.map(user => user._id.toString()) || [];
-      
-      // Get posts user has liked
-      const likedPostsData = await Post.find({ 
-        likedBy: currentUserId 
-      }).select('_id');
-      userLikedPosts = likedPostsData.map(post => post._id.toString());
-    }
+const getPosts = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
 
-    // Get all posts with necessary data
-    const allPosts = await Post.find()
-      .populate('user', 'name username profile followers')
-      .populate('comments')
-      .populate('likedBy', '_id')
-      .sort({ createdAt: -1 });
+    // Get the logged-in user's following list
+    const user = await User.findById(userId).select("following");
 
-    if (!allPosts || allPosts.length === 0) {
-      res.status(404);
-      throw new Error('Omo! Post no dey oo. Try post nau');
-    }
+    // ---------------------------
+    // 1. Posts by followed users + your own posts (HIGHEST PRIORITY)
+    // ---------------------------
+    const followedPosts = await Post.find({
+        user: { $in: [...user.following, userId] }
+    })
+        .sort({ createdAt: -1 })
+        .populate("user", "name username profile followers");
 
-    // Calculate post scores for personalized ranking
-    const scoredPosts = allPosts.map(post => {
-      const score = calculatePostScore(post, userFollowing, userLikedPosts, currentUserId);
-      return { post, score };
-    });
+    // IDs of posts the user liked
+    const likedPostIds = await Post.find({ likedBy: userId }).select("_id");
 
-    // Sort by score (descending) and then by date for new posts
-    scoredPosts.sort((a, b) => {
-      // New posts (last 24 hours) get priority
-      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const aIsNew = new Date(a.post.createdAt) > twentyFourHoursAgo;
-      const bIsNew = new Date(b.post.createdAt) > twentyFourHoursAgo;
-      
-      if (aIsNew && !bIsNew) return -1;
-      if (!aIsNew && bIsNew) return 1;
-      
-      // Then sort by calculated score
-      return b.score - a.score;
-    });
+    // ---------------------------
+    // 2. Posts similar to user's likes (MEDIUM PRIORITY)
+    // Example: same author OR similar tags OR random mix
+    // For now: posts also liked by people who liked same posts
+    // ---------------------------
+    const relatedPosts = await Post.find({
+        _id: { $nin: likedPostIds.map(p => p._id) }, // not the exact same liked posts
+        likedBy: { $in: userId }                     // similar liking behavior
+    })
+        .sort({ createdAt: -1 })
+        .populate("user", "name username profile followers");
 
-    // Add some randomness to avoid identical feeds
-    const finalPosts = addRandomness(scoredPosts.map(item => item.post));
+    // ---------------------------
+    // 3. Recommended posts (LOW PRIORITY)
+    // Posts by users you DO NOT follow
+    // ---------------------------
+    const recommendedPosts = await Post.find({
+        user: { $nin: [...user.following, userId] }
+    })
+        .sort({ createdAt: -1 })
+        .limit(20) // limit to avoid overload
+        .populate("user", "name username profile followers");
 
-    res.status(200).json(finalPosts);
-  } catch (error) {
-    console.error('Error fetching posts:', error);
-    throw error;
-  }
+    // ---------------------------
+    // Combine all results
+    // ---------------------------
+    let allPosts = [
+        ...followedPosts,
+        ...relatedPosts,
+        ...recommendedPosts
+    ];
+
+    // Remove duplicates
+    const uniquePosts = Array.from(
+        new Map(allPosts.map(p => [p._id.toString(), p])).values()
+    );
+
+    // Final sort (newest first)
+    uniquePosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    res.status(200).json(uniquePosts);
 });
 
-// Calculate personalized score for each post
-const calculatePostScore = (post, userFollowing, userLikedPosts, currentUserId) => {
-  let score = 0;
-  
-  const postCreatedAt = new Date(post.createdAt);
-  const now = new Date();
-  const hoursSinceCreation = (now - postCreatedAt) / (1000 * 60 * 60);
-  
-  // Base score from likes
-  score += (post.likedBy?.length || 0) * 2;
-  
-  // Score from comments
-  score += (post.comments?.length || 0) * 3;
-  
-  // Recent posts get higher score (decays over time)
-  const recencyScore = Math.max(0, 10 - (hoursSinceCreation / 6));
-  score += recencyScore;
-  
-  // Posts from followed users get significant boost
-  if (userFollowing.includes(post.user?._id?.toString())) {
-    score += 15;
-  }
-  
-  // Posts similar to ones user liked get boost
-  if (userLikedPosts.includes(post._id.toString())) {
-    score += 20;
-  }
-  
-  // Add some random variation (0-5 points)
-  score += Math.random() * 5;
-  
-  return score;
-};
 
-// Add randomness to avoid identical feeds
-const addRandomness = (posts) => {
-  const shuffled = [...posts];
-  
-  // For posts beyond the first 5, shuffle them with some probability
-  for (let i = 5; i < shuffled.length; i++) {
-    if (Math.random() < 0.3) { // 30% chance to swap with random post
-      const j = Math.floor(Math.random() * (shuffled.length - 5)) + 5;
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-  }
-  
-  return shuffled;
-};
 
 //Get single post
 const getPost = asyncHandler(async (req, res, next) => {
