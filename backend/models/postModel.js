@@ -7,7 +7,7 @@ const postSchema = new mongoose.Schema({
         type: String, 
         lowercase: true
     }],
-    likes: {type: Number, default: 0}, // Changed from 'like' to 'likes'
+    like: {type: Number, default: 0}, // Changed from 'like' to 'likes'
     likedBy: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

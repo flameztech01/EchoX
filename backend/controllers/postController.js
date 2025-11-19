@@ -35,59 +35,67 @@ const createPost = asyncHandler(async (req, res, next) => {
 const getPosts = asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
-    // Get the logged-in user's following list
+    // Get user
     const user = await User.findById(userId).select("following");
 
     // ---------------------------
-    // 1. Posts by followed users + your own posts (HIGHEST PRIORITY)
+    // 1. FOLLOWING POSTS + USER POSTS (Top priority)
     // ---------------------------
-    const followedPosts = await Post.find({
+    const followingPosts = await Post.find({
         user: { $in: [...user.following, userId] }
     })
         .sort({ createdAt: -1 })
         .populate("user", "name username profile followers");
 
-    // IDs of posts the user liked
-    const likedPostIds = await Post.find({ likedBy: userId }).select("_id");
 
     // ---------------------------
-    // 2. Posts similar to user's likes (MEDIUM PRIORITY)
-    // Example: same author OR similar tags OR random mix
-    // For now: posts also liked by people who liked same posts
+    // 2. POSTS USER LIKED (interests)
+    // ---------------------------
+    const likedPosts = await Post.find({ likedBy: userId });
+
+    // Extract hashtags user engages with
+    const hashtagsUserLiked = likedPosts.flatMap(p => p.hashtag);
+
+    // ---------------------------
+    // 3. RELATED INTEREST POSTS (hashtags / similar users)
     // ---------------------------
     const relatedPosts = await Post.find({
-        _id: { $nin: likedPostIds.map(p => p._id) }, // not the exact same liked posts
-        likedBy: { $in: userId }                     // similar liking behavior
+        _id: { $nin: followingPosts.map(p => p._id) },
+        hashtag: { $in: hashtagsUserLiked }
     })
         .sort({ createdAt: -1 })
         .populate("user", "name username profile followers");
 
     // ---------------------------
-    // 3. Recommended posts (LOW PRIORITY)
-    // Posts by users you DO NOT follow
+    // 4. TRENDING POSTS (fallback recommendations)
     // ---------------------------
-    const recommendedPosts = await Post.find({
-        user: { $nin: [...user.following, userId] }
+    const trendingPosts = await Post.find({
+        _id: { 
+            $nin: [
+                ...followingPosts.map(p => p._id),
+                ...relatedPosts.map(p => p._id)
+            ]
+        }
     })
-        .sort({ createdAt: -1 })
-        .limit(20) // limit to avoid overload
+        .sort({ like: -1, createdAt: -1 }) // viral first
+        .limit(20)
         .populate("user", "name username profile followers");
 
     // ---------------------------
-    // Combine all results
+    // Combine in ranking order
     // ---------------------------
     let allPosts = [
-        ...followedPosts,
-        ...relatedPosts,
-        ...recommendedPosts
+        ...followingPosts,   // #1 priority
+        ...relatedPosts,     // #2 priority
+        ...trendingPosts     // #3 priority
     ];
 
     // Remove duplicates
     const uniquePosts = Array.from(
-        new Map(allPosts.map(p => [p._id.toString(), p])).values()
+        new Map(allPosts.map(post => [post._id.toString(), post])).values()
     );
 
-    // Final sort (newest first)
+    // Final sort by time
     uniquePosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     res.status(200).json(uniquePosts);
