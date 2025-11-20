@@ -15,24 +15,29 @@ const createComment = asyncHandler(async (req, res) => {
         text, 
         author: req.user._id,
         post: post || null,
-        anonymous: post || null,
+        anonymous: anonymous || null,
     });
 
     res.status(201).json(comment);
 });
 
 // Get ghost comments
-const getGhostComments = asyncHandler(async (req, res) => {
+const getComments = asyncHandler(async (req, res) => {
     const { postId } = req.params;
     
     if (!postId) {
         res.status(400);
-        throw new Error('Anonymous ID is required');
+        throw new Error('Post ID is required');
     }
     
-    const comments = await Comment.find({ post: postId })
-        .populate('author', 'name username profile followers')
-        .sort({ createdAt: -1 });
+    const comments = await Comment.find({ 
+        $or: [
+            { post: postId },
+            { anonymous: postId }
+        ]
+    })
+    .populate('author', 'name username profile followers')
+    .sort({ createdAt: -1 });
     
     res.status(200).json(comments);
 });
@@ -78,7 +83,7 @@ const likeComment = asyncHandler(async (req, res, next) => {
 
 export {
     createComment,
-    getGhostComments,
+    getComments,
     deleteComment,
     likeComment
 };

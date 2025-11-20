@@ -19,30 +19,82 @@ const Ghostcomment = () => {
     const [unfollowUser] = useUnfollowUserMutation();
     const {userInfo} = useSelector((state) => state.auth);
 
+    // Local state for optimistic updates
+    const [localComments, setLocalComments] = React.useState([]);
+
+    // Sync fetched comments into local state
+    React.useEffect(() => {
+        if (comments) setLocalComments(comments);
+    }, [comments]);
+
+    // ⭐ Optimistic Like
     const handleLike = async (commentId) => {
+        if (!userInfo) return;
+
+        const previousComments = [...localComments];
+
+        // Optimistic update
+        const updated = localComments.map((comment) => {
+            if (comment._id === commentId) {
+                const alreadyLiked = comment.likedBy?.includes(userInfo._id);
+                return {
+                    ...comment,
+                    likedBy: alreadyLiked
+                        ? comment.likedBy.filter((id) => id !== userInfo._id)
+                        : [...comment.likedBy, userInfo._id],
+                    like: alreadyLiked ? (comment.like || 0) - 1 : (comment.like || 0) + 1,
+                };
+            }
+            return comment;
+        });
+
+        setLocalComments(updated);
+
         try {
             await likeAnonymous(commentId).unwrap();
         } catch (error) {
             console.error('Like failed:', error);
             toast.error(error.message || 'Failed to like the comment.');
+            // Revert on error
+            setLocalComments(previousComments);
         }
     };
 
-    const handleFollow = async (userId) => {
-        try {
-            await followUser(userId).unwrap();
-        } catch (error) {
-            console.error('Follow failed:', error);
-            toast.error(error.message || 'Failed to follow user.');
-        }
-    };
+    // ⭐ Optimistic Follow/Unfollow
+    const handleFollowToggle = async (userId, isFollowingNow) => {
+        if (!userInfo) return;
 
-    const handleUnfollow = async (userId) => {
+        const previousComments = [...localComments];
+
+        // Optimistic update
+        const updated = localComments.map((comment) => {
+            if (comment.author?._id === userId) {
+                return {
+                    ...comment,
+                    author: {
+                        ...comment.author,
+                        followers: isFollowingNow
+                            ? comment.author.followers.filter((id) => id !== userInfo._id)
+                            : [...comment.author.followers, userInfo._id],
+                    },
+                };
+            }
+            return comment;
+        });
+
+        setLocalComments(updated);
+
         try {
-            await unfollowUser(userId).unwrap();
+            if (isFollowingNow) {
+                await unfollowUser(userId).unwrap();
+            } else {
+                await followUser(userId).unwrap();
+            }
         } catch (error) {
-            console.error('Unfollow failed:', error);
-            toast.error(error.message || 'Failed to unfollow user.');
+            console.error('Follow/Unfollow failed:', error);
+            toast.error(error.message || `Failed to ${isFollowingNow ? 'unfollow' : 'follow'} user.`);
+            // Revert on error
+            setLocalComments(previousComments);
         }
     };
 
@@ -60,7 +112,7 @@ const Ghostcomment = () => {
 
     return (
         <div className="comments-section">
-        {comments?.map((comment) => (
+        {localComments?.map((comment) => (
             <div className='comment-card' key={comment._id}>
             <div className="comment-header">
                 <div className="comment-profile">
@@ -71,14 +123,14 @@ const Ghostcomment = () => {
                     isFollowing(comment) ? (
                         <button 
                             className="follow-btn"
-                            onClick={() => handleUnfollow(comment.author._id)}
+                            onClick={() => handleFollowToggle(comment.author._id, true)}
                         >
                             Unfollow
                         </button>
                     ) : (
                         <button 
                             className="follow-btn"
-                            onClick={() => handleFollow(comment.author._id)}
+                            onClick={() => handleFollowToggle(comment.author._id, false)}
                         >
                             Follow
                         </button>

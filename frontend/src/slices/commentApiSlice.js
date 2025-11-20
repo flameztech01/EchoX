@@ -14,7 +14,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         }),
         getComments: builder.query({
             query: (postId) => ({
-                url: `${COMMENT_URL}/anonymous/${postId}`,
+                url: `${COMMENT_URL}/post/${postId}`,
                 method: 'GET'
             })
         }),

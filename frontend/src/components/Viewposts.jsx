@@ -4,13 +4,13 @@ import {
   useGetPostsQuery,
   useLikePostMutation,
 } from "../slices/postApiSlice.js";
-import { useFollowUserMutation, useUnfollowUserMutation } from "../slices/userApiSlice.js";
-import { useSelector } from "react-redux";
+import { useGetCommentsQuery } from "../slices/commentApiSlice.js";
 import {
-  FaHeart,
-  FaRegHeart,
-  FaRegComment,
-} from "react-icons/fa";
+  useFollowUserMutation,
+  useUnfollowUserMutation,
+} from "../slices/userApiSlice.js";
+import { useSelector } from "react-redux";
+import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
 
 const Viewposts = () => {
   const {
@@ -22,57 +22,94 @@ const Viewposts = () => {
     refetchOnMountOrArgChange: true,
   });
 
+  // Fetch all comments to count them per post
+  const { data: allComments } = useGetCommentsQuery(undefined, {
+    pollingInterval: 3000,
+    refetchOnMountOrArgChange: true,
+  });
+
   const [likePost] = useLikePostMutation();
   const [followUser] = useFollowUserMutation();
   const [unfollowUser] = useUnfollowUserMutation();
+
   const [expandedImages, setExpandedImages] = React.useState({});
-  
+  const [localPosts, setLocalPosts] = React.useState([]);
+
   const { userInfo } = useSelector((state) => state.auth);
 
+  // Sync fetched posts into local state
+  React.useEffect(() => {
+    if (posts) setLocalPosts(posts);
+  }, [posts]);
+
+  // ⭐ Optimistic Like
   const handleLike = async (postId) => {
+    const updated = localPosts.map((p) => {
+      if (p._id === postId) {
+        const alreadyLiked = p.likedBy.includes(userInfo._id);
+
+        return {
+          ...p,
+          likedBy: alreadyLiked
+            ? p.likedBy.filter((id) => id !== userInfo._id)
+            : [...p.likedBy, userInfo._id],
+          like: alreadyLiked ? p.like - 1 : p.like + 1,
+        };
+      }
+      return p;
+    });
+
+    setLocalPosts(updated); // update UI instantly
+
     try {
       await likePost(postId).unwrap();
     } catch (error) {
       console.error("Error liking post:", error);
+      setLocalPosts(posts); // revert if backend fails
     }
   };
 
-  const handleFollow = async (userId) => {
-    try {
-      await followUser(userId).unwrap();
-      refetchPosts();
-    } catch (error) {
-      console.error("Error following user:", error);
-    }
-  };
+  // ⭐ Optimistic Follow/Unfollow
+  const handleFollowToggle = async (userId, isFollowingNow) => {
+    const updated = localPosts.map((p) => {
+      if (p.user?._id === userId) {
+        return {
+          ...p,
+          user: {
+            ...p.user,
+            followers: isFollowingNow
+              ? p.user.followers.filter((id) => id !== userInfo._id)
+              : [...p.user.followers, userInfo._id],
+          },
+        };
+      }
+      return p;
+    });
 
-  const handleUnfollow = async (userId) => {
+    setLocalPosts(updated); // UI first
+
     try {
-      await unfollowUser(userId).unwrap();
-      refetchPosts();
+      if (isFollowingNow) {
+        await unfollowUser(userId).unwrap();
+      } else {
+        await followUser(userId).unwrap();
+      }
     } catch (error) {
-      console.error("Error unfollowing user:", error);
+      console.error("Follow/Unfollow failed:", error);
+      setLocalPosts(posts); // revert if failed
     }
   };
 
   const toggleImageExpand = (postId) => {
-    setExpandedImages(prev => ({
+    setExpandedImages((prev) => ({
       ...prev,
-      [postId]: !prev[postId]
+      [postId]: !prev[postId],
     }));
   };
 
-  const isLiked = (post) => {
-    return post.likedBy?.includes(userInfo?._id);
-  };
-
-  const isOwnPost = (post) => {
-    return post.user?._id === userInfo?._id;
-  };
-
-  const isFollowing = (post) => {
-    return post.user?.followers?.includes(userInfo?._id);
-  };
+  const isLiked = (post) => post.likedBy?.includes(userInfo?._id);
+  const isOwnPost = (post) => post.user?._id === userInfo?._id;
+  const isFollowing = (post) => post.user?.followers?.includes(userInfo?._id);
 
   if (isLoading) {
     return (
@@ -99,45 +136,79 @@ const Viewposts = () => {
 
   return (
     <div className="peak">
-      {posts?.map((post) => (
-        <div className="high" key={post._id}>
+      {localPosts?.map((post) => (
+        <Link
+          to={`/post/${post._id}`}
+          className="high post-container"
+          key={post._id}
+          style={{ textDecoration: "none", color: "inherit", display: "block" }}
+        >
           <div className="profileSide">
             <div className="postProfile">
               <img src={post?.user?.profile || `/default-avatar.jpg`} alt="" />
-              <Link to={`/profile/${post.user?._id}`}>
+              <Link
+                to={`/profile/${post.user?._id}`}
+                onClick={(e) => e.stopPropagation()}
+                style={{ textDecoration: "none" }}
+              >
                 {post?.user?.username}
               </Link>
             </div>
+
+            {/* FOLLOW / UNFOLLOW */}
             <div className="postFoll">
-              {!isOwnPost(post) && userInfo && (
-                isFollowing(post) ? (
-                  <button 
-                    type="button" 
-                    onClick={() => handleUnfollow(post.user?._id)}
+              {!isOwnPost(post) &&
+                userInfo &&
+                (isFollowing(post) ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      handleFollowToggle(post.user?._id, true);
+                    }}
                   >
                     Unfollow
                   </button>
                 ) : (
-                  <button 
-                    type="button" 
-                    onClick={() => handleFollow(post.user?._id)}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      handleFollowToggle(post.user?._id, false);
+                    }}
                   >
                     Follow
                   </button>
-                )
-              )}
+                ))}
             </div>
           </div>
+
           <h2>{post.text}</h2>
-          <img 
-            src={post.image} 
-            alt="" 
-            className={`postImg ${expandedImages[post._id] ? 'expanded' : ''}`}
-            onClick={() => toggleImageExpand(post._id)}
+
+          <img
+            src={post.image}
+            alt=""
+            className={`postImg ${expandedImages[post._id] ? "expanded" : ""}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              toggleImageExpand(post._id);
+            }}
           />
+
+          {/* LIKE, COMMENT */}
           <div className="postAction">
             <div className="likes-count">
-              <button className="icon-btn" onClick={() => handleLike(post._id)}>
+              <button
+                className="icon-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  handleLike(post._id);
+                }}
+              >
                 {isLiked(post) ? (
                   <FaHeart className="icon liked" />
                 ) : (
@@ -146,14 +217,15 @@ const Viewposts = () => {
               </button>
               <p>{post.like || 0} Likes</p>
             </div>
+
             <div className="likes-count">
-              <Link to={`/post/${post._id}`} className="icon-btn">
+              <div className="icon-btn">
                 <FaRegComment className="icon" />
-              </Link>
-              <Link to={`/post/${post._id}`}>Comments</Link>
+              </div>
+              <p>{getCommentCount(post._id)} Comments</p>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

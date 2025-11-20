@@ -2,7 +2,7 @@ import express from 'express';
 import { protect } from '../middleware/authMiddleware.js';
 import {
     createComment,
-    getGhostComments,
+    getComments,
     deleteComment,
     likeComment
 } from '../controllers/commentController.js';
@@ -10,7 +10,8 @@ import {
 const router = express.Router();
 
 router.post('/reply', protect, createComment);
-router.get('/anonymous/:postId', protect, getGhostComments);
+// router.get('/anonymous/:postId', protect, getGhostComments);
+router.get('/post/:postId', protect, getComments);
 router.delete('/:id', protect, deleteComment);
 router.patch('/:id/like', protect, likeComment);
 
