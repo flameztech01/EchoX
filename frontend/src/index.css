@@ -605,6 +605,17 @@
     gap: 12px;
   }
 
+  .post-user-info {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+  }
+
+  .post-user-info .post-time {
+    color: rgb(168, 164, 164);
+    font-size: 11px;
+  }
+
   .postProfile img {
     width: 42px;
     height: 42px;
@@ -720,6 +731,11 @@
     color: var(--text-secondary);
   }
 
+  .likes-count button {
+    display: flex;
+    gap: 2px;
+  }
+
   .timestamp {
     font-size: 12px;
     color: var(--text-secondary);
@@ -754,6 +770,101 @@
     color: #1EA1D9;
   }
 
+
+
+.comment-time {
+  color: rgb(155, 150, 150);
+  font-size: 12px;
+}
+
+.comment-meta {
+  display: flex;
+  align-items: first baseline;
+  gap: 4px;
+}
+
+  .comment-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.replying-to {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.replying-to a {
+  color: #1EA1D9;
+  text-decoration: none;
+}
+
+.replying-to a:hover {
+  text-decoration: underline;
+}
+
+.replies-section {
+  margin-left: 20px;
+  border-left: 2px solid var(--border-color);
+  padding-left: 15px;
+  margin-top: 15px;
+}
+
+.replies-section h4 {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 10px 0;
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.reply-to-main {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+}
+
+.reply-to-main h4 {
+  color: var(--text-primary);
+  font-size: 16px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background: var(--hover-color);
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.icon-button:hover {
+  background: var(--hover-color);
+}
 
 
 
@@ -892,6 +1003,10 @@
   /* Comments section */
   .comments {
     padding: 12px 20px;
+  }
+
+  .comment-card {
+    margin-top: 90px;
   }
 
   .comment {
@@ -1127,6 +1242,76 @@
     display: none;
   }
 }
+
+
+/* commentId styles......................................................
+............................................................................................
+*/
+
+
+/* Add to your existing CSS */
+.comment-thread-page {
+  margin-top: 40px; /* Push content below fixed navbar */
+  padding: 20px;
+}
+
+.replies-section {
+  margin-left: 20px;
+  border-left: 2px solid var(--border-color);
+  padding-left: 15px;
+  margin-top: 15px;
+}
+
+.replies-section h4 {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 10px 0;
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.reply-to-main {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+}
+
+.reply-to-main h4 {
+  color: var(--text-primary);
+  font-size: 16px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* Remove the individual comment-card margin-top */
+.comment-card {
+  /* Remove this: margin-top: 90px; */
+  background: var(--card-bg);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 40px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   /* Bottom Bar */

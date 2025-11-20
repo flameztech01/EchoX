@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 
-const Ghostcommentform = ({ isAnonymous = false }) => {
+const Ghostcommentform = ({ isAnonymous = false, parentComment = null }) => {
   const { id: postId } = useParams();
   const [comments, { isLoading }] = useReplyCommentMutation();
   const navigate = useNavigate();
@@ -21,6 +21,7 @@ const Ghostcommentform = ({ isAnonymous = false }) => {
     try {
       await comments({
         [isAnonymous ? "anonymous" : "post"]: postId,
+        parentComment: parentComment, // Make sure this is set
         text: text,
         author: userInfo._id,
       }).unwrap();

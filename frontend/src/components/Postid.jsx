@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaRegComment, FaShare, FaEye } from "react-icons/fa";
 import {
   useFollowUserMutation,
   useUnfollowUserMutation,
@@ -29,6 +29,48 @@ const Postid = () => {
   React.useEffect(() => {
     if (post) setLocalPost(post);
   }, [post]);
+
+  // Time ago function
+  const timeAgo = (date) => {
+    const now = new Date();
+    const diff = now - new Date(date);
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return "just now";
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return new Date(date).toLocaleDateString();
+  };
+
+  // ⭐ Share functionality
+  const handleShare = async (postId) => {
+    const shareUrl = `${window.location.origin}/post/${postId}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Check out this post',
+          text: 'Thought you might like this',
+          url: shareUrl,
+        });
+      } catch (error) {
+        console.log('Share cancelled');
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(shareUrl)
+        .then(() => {
+          toast.success('Link copied to clipboard!');
+        })
+        .catch(() => {
+          // Final fallback: show URL
+          toast.info(`Share this link: ${shareUrl}`);
+        });
+    }
+  };
 
   // ⭐ Optimistic Like
   const handleLike = async (postId) => {
@@ -129,6 +171,8 @@ const Postid = () => {
           <div className="postAction">
             <div className="skeleton-button"></div>
             <div className="skeleton-button"></div>
+            <div className="skeleton-button"></div>
+            <div className="skeleton-button"></div>
           </div>
         </div>
       </div>
@@ -145,9 +189,12 @@ const Postid = () => {
           <div className="profileSide">
             <div className="postProfile">
               <img src={displayPost?.user?.profile || `/default-avatar.jpg`} alt="" />
-              <Link to={`/profile/${displayPost.user?._id}`}>
-                {displayPost?.user?.username}
-              </Link>
+              <div className="post-user-info">
+                <Link to={`/profile/${displayPost.user?._id}`}>
+                  {displayPost?.user?.username}
+                </Link>
+                <span className="post-time">{timeAgo(displayPost.createdAt)}</span>
+              </div>
             </div>
             <div className="postFoll">
               {!isOwnPost(displayPost) &&
@@ -185,13 +232,27 @@ const Postid = () => {
                   <FaRegHeart className="icon" />
                 )}
               </button>
-              <p>{displayPost.like || 0} Likes</p>
+              <p>{displayPost.like || 0}</p>
             </div>
             <div className="likes-count">
               <div className="icon-btn">
                 <FaRegComment className="icon" />
               </div>
-              <p>{displayPost.comments?.length || 0} Comments</p>
+              <p>{displayPost.comments?.length || 0}</p>
+            </div>
+          
+            <div className="likes-count">
+              <div className="icon-btn">
+                <FaEye className="icon" />
+              </div>
+              <p>{displayPost.views || 0}</p>
+            </div>
+
+            <div className="likes-count">
+              <button className="icon-btn" onClick={() => handleShare(displayPost._id)}>
+                <FaShare className="icon" />
+                <p>Share</p>
+              </button>
             </div>
           </div>
         </div>

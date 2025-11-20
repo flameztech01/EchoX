@@ -47,6 +47,21 @@ const Viewposts = () => {
     return allComments.filter(comment => comment.post === postId).length;
   };
 
+  // Time ago function
+  const timeAgo = (date) => {
+    const now = new Date();
+    const diff = now - new Date(date);
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return "just now";
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return new Date(date).toLocaleDateString();
+  };
+
   // ⭐ Share functionality
   const handleShare = async (postId) => {
     if (navigator.share) {
@@ -175,13 +190,16 @@ const Viewposts = () => {
           <div className="profileSide">
             <div className="postProfile">
               <img src={post?.user?.profile || `/default-avatar.jpg`} alt="" />
-              <Link
-                to={`/profile/${post.user?._id}`}
-                onClick={(e) => e.stopPropagation()}
-                style={{ textDecoration: "none" }}
-              >
-                {post?.user?.username}
-              </Link>
+              <div className="post-user-info">
+                <Link
+                  to={`/profile/${post.user?._id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ textDecoration: "none" }}
+                >
+                  {post?.user?.username}
+                </Link>
+                <span className="post-time">{timeAgo(post.createdAt)}</span>
+              </div>
             </div>
 
             {/* FOLLOW / UNFOLLOW */}
@@ -251,9 +269,8 @@ const Viewposts = () => {
               <div className="icon-btn">
                 <FaRegComment className="icon" />
               </div>
-              <p>{post.comments?.length || 0}</p>
+              <p>{getCommentCount(post._id)}</p>
             </div>
-
 
             <div className="likes-count">
               <div className="icon-btn">
@@ -272,8 +289,8 @@ const Viewposts = () => {
                 }}
               >
                 <FaShare className="icon" />
+                <p>Share</p>
               </button>
-              <p>Share</p>
             </div>
           </div>
         </Link>

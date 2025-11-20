@@ -8,7 +8,7 @@ import Anonymous from "../models/anonymousModel.js";
 
 // Create comment
 const createComment = asyncHandler(async (req, res) => {
-  const { text, post, anonymous } = req.body;
+  const { text, post, anonymous, parentComment } = req.body; // ADD parentComment
 
   if (!text) {
     res.status(400);
@@ -19,7 +19,8 @@ const createComment = asyncHandler(async (req, res) => {
     text,
     author: req.user._id,
     post: post || null,
-    anonymous: anonymous || null, // FIXED: Use anonymous parameter
+    anonymous: anonymous || null,
+    parentComment: parentComment || null, // ADD THIS LINE
   });
 
   // Push comment to the correct model
@@ -53,6 +54,23 @@ const getComments = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 });
 
   res.status(200).json(comments);
+});
+
+// Get comment and its replies
+const getCommentThread = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    
+    const comment = await Comment.findById(id)
+        .populate('author', 'name username profile followers');
+    
+    const replies = await Comment.find({ parentComment: id })
+        .populate('author', 'name username profile followers')
+        .sort({ createdAt: 1 }); // Oldest first for chronological thread
+
+    res.status(200).json({
+        comment,
+        replies
+    });
 });
 
 //Delete comment
@@ -94,4 +112,9 @@ const likeComment = asyncHandler(async (req, res, next) => {
   res.status(200).json(comment);
 });
 
-export { createComment, getComments, deleteComment, likeComment };
+export { createComment, 
+  getComments, 
+  getCommentThread, 
+  deleteComment, 
+  likeComment
+ };
