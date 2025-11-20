@@ -42,6 +42,11 @@ const Viewposts = () => {
     if (posts) setLocalPosts(posts);
   }, [posts]);
 
+  const getCommentCount = (postId) => {
+    if (!allComments) return 0;
+    return allComments.filter(comment => comment.post === postId).length;
+};
+
   // ⭐ Optimistic Like
   const handleLike = async (postId) => {
     const updated = localPosts.map((p) => {
@@ -222,7 +227,7 @@ const Viewposts = () => {
               <div className="icon-btn">
                 <FaRegComment className="icon" />
               </div>
-              <p>{post.comments?.length || 0} Comments</p>
+              <p>{getCommentCount(post._id)} Comments</p>
             </div>
           </div>
         </Link>

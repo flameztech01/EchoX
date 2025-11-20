@@ -141,7 +141,7 @@ const Anonymous = () => {
               <div className="icon-btn">
                 <FaRegComment className="icon" />
               </div>
-              <p>{post.comments?.length || 0} Comments</p>
+              <p>{getCommentCount(post._id)} Comments</p>
             </div>
           </div>
         </Link>
