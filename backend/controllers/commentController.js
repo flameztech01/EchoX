@@ -1,89 +1,97 @@
-import express from 'express';
-import Comment from '../models/commentModel.js';
-import asyncHandler from 'express-async-handler';
+import express from "express";
+import Comment from "../models/commentModel.js";
+import asyncHandler from "express-async-handler";
+
+//Other Models
+import Post from "../models/postModel.js";
+import Anonymous from "../models/anonymousModel.js";
 
 // Create comment
 const createComment = asyncHandler(async (req, res) => {
-    const { text, author, post, anonymous, parentComment } = req.body;
-    
-    if (!text) {
-        res.status(400);
-        throw new Error('Text and author are required');
-    }
-    
-    const comment = await Comment.create({
-        text, 
-        author: req.user._id,
-        post: post || null,
-        anonymous: anonymous || null,
-    });
+  const { text, post, anonymous } = req.body;
 
-    res.status(201).json(comment);
+  if (!text) {
+    res.status(400);
+    throw new Error("Text is required");
+  }
+
+  const comment = await Comment.create({
+    text,
+    author: req.user._id,
+    post: post || null,
+    anonymous: anonymous || null, // FIXED: Use anonymous parameter
+  });
+
+  // Push comment to the correct model
+  if (post) {
+    await Post.findByIdAndUpdate(post, {
+      $push: { comments: comment._id },
+    });
+  }
+  if (anonymous) {
+    await Anonymous.findByIdAndUpdate(anonymous, {
+      $push: { comments: comment._id },
+    });
+  }
+
+  res.status(201).json(comment);
 });
 
 // Get ghost comments
 const getComments = asyncHandler(async (req, res) => {
-    const { postId } = req.params;
-    
-    if (!postId) {
-        res.status(400);
-        throw new Error('Post ID is required');
-    }
-    
-    const comments = await Comment.find({ 
-        $or: [
-            { post: postId },
-            { anonymous: postId }
-        ]
-    })
-    .populate('author', 'name username profile followers')
+  const { postId } = req.params;
+
+  if (!postId) {
+    res.status(400);
+    throw new Error("Post ID is required");
+  }
+
+  const comments = await Comment.find({
+    $or: [{ post: postId }, { anonymous: postId }],
+  })
+    .populate("author", "name username profile followers")
     .sort({ createdAt: -1 });
-    
-    res.status(200).json(comments);
+
+  res.status(200).json(comments);
 });
 
-//Delete comment 
+//Delete comment
 const deleteComment = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const deletedComment = await Comment.findByIdAndDelete(id);
-    
-    if(!deletedComment) {
-        res.status(404);
-        throw new Error('Comment not found');
-    }
-    
-    res.status(200).json(deletedComment);
+  const { id } = req.params;
+  const deletedComment = await Comment.findByIdAndDelete(id);
+
+  if (!deletedComment) {
+    res.status(404);
+    throw new Error("Comment not found");
+  }
+
+  res.status(200).json(deletedComment);
 });
 
 //Like Comment
 const likeComment = asyncHandler(async (req, res, next) => {
-    const comment = await Comment.findById(req.params.id);
+  const comment = await Comment.findById(req.params.id);
 
-  if(!comment){
-        res.status(404);
-        throw new Error('Anonymous wey you wan like no dey again')
-    };
+  if (!comment) {
+    res.status(404);
+    throw new Error("Anonymous wey you wan like no dey again");
+  }
 
-    // Check if user already liked
-    const alreadyLiked = comment.likedBy.includes(req.user._id);
-    
-    if (alreadyLiked) {
-        // Unlike
-        comment.like -= 1;
-        comment.likedBy.pull(req.user._id);
-    } else {
-        // Like
-        comment.like += 1;
-        comment.likedBy.push(req.user._id);
-    }
+  // Check if user already liked
+  const alreadyLiked = comment.likedBy.includes(req.user._id);
 
-    await comment.save();
-    res.status(200).json(comment);
+  if (alreadyLiked) {
+    // Unlike
+    comment.like -= 1;
+    comment.likedBy.pull(req.user._id);
+  } else {
+    // Like
+    comment.like += 1;
+    comment.likedBy.push(req.user._id);
+  }
+
+  await comment.save();
+  res.status(200).json(comment);
 });
 
-export {
-    createComment,
-    getComments,
-    deleteComment,
-    likeComment
-};
+export { createComment, getComments, deleteComment, likeComment };

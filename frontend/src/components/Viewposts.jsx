@@ -10,7 +10,7 @@ import {
   useUnfollowUserMutation,
 } from "../slices/userApiSlice.js";
 import { useSelector } from "react-redux";
-import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaRegComment, FaShare, FaEye } from "react-icons/fa";
 
 const Viewposts = () => {
   const {
@@ -45,7 +45,31 @@ const Viewposts = () => {
   const getCommentCount = (postId) => {
     if (!allComments) return 0;
     return allComments.filter(comment => comment.post === postId).length;
-};
+  };
+
+  // ⭐ Share functionality
+  const handleShare = async (postId) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Check out this post',
+          text: 'Thought you might like this',
+          url: `${window.location.origin}/post/${postId}`,
+        });
+      } catch (error) {
+        console.log('Share cancelled');
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(`${window.location.origin}/post/${postId}`)
+        .then(() => {
+          alert('Link copied to clipboard!');
+        })
+        .catch(() => {
+          alert('Share this link: ' + `${window.location.origin}/post/${postId}`);
+        });
+    }
+  };
 
   // ⭐ Optimistic Like
   const handleLike = async (postId) => {
@@ -203,7 +227,7 @@ const Viewposts = () => {
             }}
           />
 
-          {/* LIKE, COMMENT */}
+          {/* LIKE, COMMENT, SHARE, VIEWS */}
           <div className="postAction">
             <div className="likes-count">
               <button
@@ -220,14 +244,36 @@ const Viewposts = () => {
                   <FaRegHeart className="icon" />
                 )}
               </button>
-              <p>{post.like || 0} Likes</p>
+              <p>{post.like || 0} </p>
             </div>
 
             <div className="likes-count">
               <div className="icon-btn">
                 <FaRegComment className="icon" />
               </div>
-              <p>{getCommentCount(post._id)} Comments</p>
+              <p>{post.comments?.length || 0}</p>
+            </div>
+
+
+            <div className="likes-count">
+              <div className="icon-btn">
+                <FaEye className="icon" />
+              </div>
+              <p>{post.views || 0} Views</p>
+            </div>
+
+             <div className="likes-count">
+              <button
+                className="icon-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  handleShare(post._id);
+                }}
+              >
+                <FaShare className="icon" />
+              </button>
+              <p>Share</p>
             </div>
           </div>
         </Link>

@@ -13,6 +13,10 @@ const anonymousSchema = mongoose.Schema({
         ref: 'User',
         required: true
     },
+    comments: [{ // ADD THIS FIELD for comments
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment'
+    }],
     createdAt: {type: Date, default: Date.now}
 }, {
     timestamps: true

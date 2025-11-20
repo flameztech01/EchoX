@@ -548,7 +548,7 @@
   /* Viewposts */
   .peak {
     margin-top: 90px;
-    margin-bottom: 60px;
+    margin-bottom: 90px;
   }
 
   .Posts {
@@ -695,43 +695,8 @@
     align-items: center;
   }
 
-  .postAction input[type="checkbox"] {
-    opacity: 0;
-    position: absolute;
-    width: 0;
-    height: 0;
-  }
+  
 
-  .postAction label {
-    font-size: 24px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
-    color: var(--text-secondary);
-    padding: 4px;
-  }
-
-  .likes-count {
-    position: relative;
-  }
-
-  .likes-count label[style*="color: red"] {
-    color: red !important;
-  }
-
-  .likes-count label[style*="color: grey"] {
-    color: grey !important;
-  }
-
-  #bookmark:checked + label {
-    color: var(--text-primary);
-    transform: scale(1.1);
-  }
-
-  .postAction label:hover {
-    transform: scale(1.15);
-    color: var(--text-secondary);
-  }
 
   .engagement {
     padding: 0 20px 12px;
@@ -740,13 +705,13 @@
 
   .likes-count {
     display: flex;
-    gap: 5px;
     align-items: center;
+    justify-content: center;
   }
 
   .likes-count p {
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 200;
+    font-size: 5px;
     color: var(--text-secondary);
   }
 
@@ -760,6 +725,33 @@
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+  }
+
+
+
+
+  /* React Icons */
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    align-items: center;
+    display: flex;
+  }
+
+  .icon {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+  }
+
+  .icon:hover {
+    color: var(--text-primary);
+  }
+
+  .liked {
+    color: #1EA1D9;
   }
 
 
@@ -858,6 +850,8 @@
     object-fit: contain;
   }
 
+
+  
 
 
 
@@ -1974,28 +1968,6 @@
   button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-  }
-
-  /* React Icons */
-  .icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-  }
-
-  .icon {
-    font-size: 1.2rem;
-    color: var(--text-secondary);
-    transition: color 0.2s;
-  }
-
-  .icon:hover {
-    color: var(--text-primary);
-  }
-
-  .liked {
-    color: #1EA1D9;
   }
 
   /* Followers Screen */

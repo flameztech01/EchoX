@@ -11,7 +11,7 @@ const Onepost = () => {
       <PostNavbar />
       <Postid />
     <Comment />
-    <Ghostcommentform />
+    <Ghostcommentform isAnonymous={false} />
     </div>
   )
 }

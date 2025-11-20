@@ -10,7 +10,7 @@ const Oneghostpost = () => {
       <Postnav />
       <Ghostid />
       <Ghostcomment />
-      <Ghostcommentform />
+      <Ghostcommentform isAnonymous={ true } />
     </div>
   )
 }
