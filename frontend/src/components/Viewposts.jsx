@@ -222,7 +222,7 @@ const Viewposts = () => {
               <div className="icon-btn">
                 <FaRegComment className="icon" />
               </div>
-              <p>{getCommentCount(post._id)} Comments</p>
+              <p>{post.comments?.length || 0} Comments</p>
             </div>
           </div>
         </Link>
