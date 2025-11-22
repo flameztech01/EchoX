@@ -56,16 +56,41 @@ const getComments = asyncHandler(async (req, res) => {
   res.status(200).json(comments);
 });
 
-// Get comment and its replies
 const getCommentThread = asyncHandler(async (req, res) => {
     const { id } = req.params;
     
     const comment = await Comment.findById(id)
-        .populate('author', 'name username profile followers');
+        .populate('author', 'name username profile followers')
+        .populate({
+            path: 'post',
+            select: 'text image user createdAt likedBy like views',
+            populate: {
+                path: 'user',
+                select: 'username profile'
+            }
+        })
+        .populate({
+            path: 'anonymous',
+            select: 'text image createdAt likedBy like views',
+            // Anonymous posts don't have a user field since they're anonymous
+        });
     
     const replies = await Comment.find({ parentComment: id })
         .populate('author', 'name username profile followers')
-        .sort({ createdAt: 1 }); // Oldest first for chronological thread
+        .populate({
+            path: 'post',
+            select: 'text image user createdAt likedBy like views',
+            populate: {
+                path: 'user',
+                select: 'username profile'
+            }
+        })
+        .populate({
+            path: 'anonymous',
+            select: 'text image createdAt likedBy like views',
+            // Anonymous posts don't have a user field
+        })
+        .sort({ createdAt: 1 });
 
     res.status(200).json({
         comment,

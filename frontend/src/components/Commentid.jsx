@@ -35,6 +35,71 @@ const Commentid = () => {
     if (threadData) setLocalThread(threadData);
   }, [threadData]);
 
+  // Time ago function for post preview
+  const timeAgo = (date) => {
+    const now = new Date();
+    const diff = now - new Date(date);
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return "just now";
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return new Date(date).toLocaleDateString();
+  };
+
+  // Render original post preview
+// Render original post preview
+const renderPostPreview = () => {
+  if (!displayThread?.comment) return null;
+  
+  const comment = displayThread.comment;
+  
+  // Check if it's a regular post or anonymous post
+  if (comment.post) {
+    // Regular post
+    const post = comment.post;
+    return (
+      <div className="original-post-section">
+        <h4 className="section-title">Original Post</h4>
+        <div className="post-preview">
+          <div className="post-header">
+            <img src={post.user?.profile || "/default-avatar.jpg"} alt="" className="post-avatar" />
+            <div className="post-user-info">
+              <span className="username">{post.user?.username}</span>
+              <span className="post-time">{timeAgo(post.createdAt)}</span>
+            </div>
+          </div>
+          <p className="post-text">{post.text}</p>
+          {post.image && <img src={post.image} alt="" className="post-image-preview" />}
+        </div>
+      </div>
+    );
+  } else if (comment.anonymous) {
+    // Anonymous post
+    const anonymousPost = comment.anonymous;
+    return (
+      <div className="original-post-section">
+        <h4 className="section-title">Original Anonymous Post</h4>
+        <div className="post-preview">
+          <div className="post-header">
+            <img src="/ghost.jpg" alt="" className="post-avatar" />
+            <div className="post-user-info">
+              <span className="username">Anonymous</span>
+              <span className="post-time">{timeAgo(anonymousPost.createdAt)}</span>
+            </div>
+          </div>
+          <p className="post-text">{anonymousPost.text}</p>
+          {anonymousPost.image && <img src={anonymousPost.image} alt="" className="post-image-preview" />}
+        </div>
+      </div>
+    );
+  }
+  
+  return null;
+};
   // ⭐ Optimistic Like for comments and replies
   const handleLike = async (commentId) => {
     if (!userInfo || !localThread) return;
@@ -168,21 +233,27 @@ const Commentid = () => {
     <div>
       <CommentNav />
       <div className="comment-thread-page">
-        {/* Original comment */}
+        {/* Original Post at the top - like Twitter */}
+        {renderPostPreview()}
+        
+        {/* Original comment that was replied to */}
         {displayThread?.comment && (
-          <CommentCard
-            comment={displayThread.comment}
-            onLike={handleLike}
-            onFollowToggle={handleFollowToggle}
-            showReplyButton={true}
-            showOptions={true}
-          />
+          <div className="replied-comment-section">
+            <h4 className="section-title">Replying to</h4>
+            <CommentCard
+              comment={displayThread.comment}
+              onLike={handleLike}
+              onFollowToggle={handleFollowToggle}
+              showReplyButton={true}
+              showOptions={true}
+            />
+          </div>
         )}
         
         {/* Replies with proper nesting */}
         {displayThread?.replies?.length > 0 && (
           <div className="replies-section">
-            <h4>Replies ({displayThread.replies.length})</h4>
+            <h4 className="section-title">Replies ({displayThread.replies.length})</h4>
             {displayThread.replies.map((reply) => (
               <CommentCard 
                 comment={reply} 

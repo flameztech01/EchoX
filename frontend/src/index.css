@@ -743,6 +743,7 @@
     letter-spacing: 0.5px;
   }
 
+  
 
 
 
@@ -1250,6 +1251,163 @@
 ............................................................................................
 */
 
+/* Original Post Section for Comment Thread */
+.original-post-section {
+  background: var(--card-bg);
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.section-title {
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  margin: 0;
+  background: var(--card-bg);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.post-preview {
+  padding: 20px;
+  background: var(--card-bg);
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-color);
+  transition: border-color 0.3s ease;
+}
+
+.post-avatar:hover {
+  border-color: #1EA1D9;
+}
+
+.post-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.post-user-info .username {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.post-user-info .username:hover {
+  color: #1EA1D9;
+}
+
+.post-time {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.post-text {
+  margin: 12px 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  word-wrap: break-word;
+}
+
+.post-image-preview {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-top: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.post-image-preview:hover {
+  opacity: 0.95;
+}
+
+.post-image-preview.expanded {
+  max-height: none;
+  object-fit: contain;
+}
+
+/* Responsive for post preview */
+@media (max-width: 780px) {
+  .post-preview {
+    padding: 15px;
+  }
+  
+  .post-header {
+    gap: 10px;
+  }
+  
+  .post-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .post-text {
+    font-size: 14px;
+    margin: 10px 0;
+  }
+  
+  .post-image-preview {
+    max-height: 300px;
+    border-radius: 8px;
+  }
+  
+  .section-title {
+    padding: 14px 15px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-preview {
+    padding: 12px;
+  }
+  
+  .post-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .post-user-info .username {
+    font-size: 13px;
+  }
+  
+  .post-time {
+    font-size: 11px;
+  }
+  
+  .post-text {
+    font-size: 13px;
+  }
+  
+  .post-image-preview {
+    max-height: 250px;
+  }
+  
+  .section-title {
+    padding: 12px;
+    font-size: 12px;
+  }
+}
 
 /* Add to your existing CSS */
 .comment-thread-page {
@@ -1296,7 +1454,6 @@
   box-shadow: 0 2px 8px var(--shadow-color);
   border: 1px solid var(--border-color);
 }
-
 
 
 
