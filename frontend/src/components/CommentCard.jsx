@@ -12,6 +12,7 @@ const CommentCard = ({
   onDelete = null,
   onEdit = null,
   showOptions = false,
+  replyCount = 0, // Add replyCount prop
 }) => {
   const { userInfo } = useSelector((state) => state.auth);
   const [showMenu, setShowMenu] = React.useState(false);
@@ -67,122 +68,159 @@ const CommentCard = ({
   };
 
   return (
-    <div className="comment-card">
-      <div className="comment-header">
-        <div className="comment-profile">
-          <img
-            src={comment.author.profile || "/default-avatar.jpg"}
-            alt=""
-            className="comment-avatar"
-          />
-          <div className="comment-user-info">
-            <div className="comment-meta">
-              <Link
-                to={`/profile/${comment.author._id}`}
-                className="comment-username"
-              >
-                {comment.author.username}
-              </Link>
-              <span className="comment-time">{timeAgo(comment.createdAt)}</span>
+    <Link 
+      to={`/comment/${comment._id}`} 
+      className="comment-card-link" 
+      style={{ textDecoration: "none", color: "inherit", display: "block" }}
+    >
+      <div className="comment-card">
+        <div className="comment-header">
+          <div className="comment-profile">
+            <img
+              src={comment.author.profile || "/default-avatar.jpg"}
+              alt=""
+              className="comment-avatar"
+            />
+            <div className="comment-user-info">
+              <div className="comment-meta">
+                <div
+                  className="comment-username"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = `/profile/${comment.author._id}`;
+                  }}
+                  style={{ cursor: "pointer", display: "inline" }}
+                >
+                  {comment.author.username}
+                </div>
+                <span className="comment-time">{timeAgo(comment.createdAt)}</span>
+              </div>
+              {/* Show "replying to" for replies */}
+              {parentComment && (
+                <div className="replying-to">
+                  replying to <span>@{parentComment.author?.username}</span>
+                </div>
+              )}
             </div>
-            {/* Show "replying to" for replies */}
-            {parentComment && (
-              <div className="replying-to">
-                replying to <span>@{parentComment.author?.username}</span>
+          </div>
+
+          <div className="comment-header-actions">
+            {!isOwnComment() &&
+              userInfo &&
+              (isFollowing() ? (
+                <button
+                  className="follow-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onFollowToggle(comment.author._id, true);
+                  }}
+                >
+                  Unfollow
+                </button>
+              ) : (
+                <button
+                  className="follow-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onFollowToggle(comment.author._id, false);
+                  }}
+                >
+                  Follow
+                </button>
+              ))}
+
+            {/* Options menu for own comments */}
+            {isOwnComment() && showOptions && (
+              <div className="comment-options">
+                <button
+                  className="icon-btn options-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowMenu(!showMenu);
+                  }}
+                >
+                  <FaEllipsisH className="icon" />
+                </button>
+
+                {showMenu && (
+                  <div className="options-menu">
+                    <button onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleEdit();
+                    }}>Edit</button>
+                    <button onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDelete();
+                    }} className="delete-btn">
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
 
-        <div className="comment-header-actions">
-          {!isOwnComment() &&
-            userInfo &&
-            (isFollowing() ? (
-              <button
-                className="follow-btn"
-                onClick={() => onFollowToggle(comment.author._id, true)}
-              >
-                Unfollow
-              </button>
-            ) : (
-              <button
-                className="follow-btn"
-                onClick={() => onFollowToggle(comment.author._id, false)}
-              >
-                Follow
-              </button>
-            ))}
-
-          {/* Options menu for own comments */}
-          {isOwnComment() && showOptions && (
-            <div className="comment-options">
-              <button
-                className="icon-btn options-btn"
-                onClick={() => setShowMenu(!showMenu)}
-              >
-                <FaEllipsisH className="icon" />
-              </button>
-
-              {showMenu && (
-                <div className="options-menu">
-                  <button onClick={handleEdit}>Edit</button>
-                  <button onClick={handleDelete} className="delete-btn">
-                    Delete
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Comment text or edit form */}
-      {isEditing ? (
-        <div className="edit-comment">
-          <textarea
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            className="edit-textarea"
-            maxLength={280}
-          />
-          <div className="edit-actions">
-            <span className="char-count">{editText.length}/280</span>
-            <div className="edit-buttons">
-              <button onClick={handleCancelEdit} className="cancel-btn">
-                Cancel
-              </button>
-              <button onClick={handleSaveEdit} className="save-btn">
-                Save
-              </button>
+        {/* Comment text or edit form */}
+        {isEditing ? (
+        <div className="edit-comment" onClick={(e) => e.stopPropagation()}>
+            <textarea
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              className="edit-textarea"
+              maxLength={280}
+            />
+            <div className="edit-actions">
+              <span className="char-count">{editText.length}/280</span>
+              <div className="edit-buttons">
+                <button onClick={handleCancelEdit} className="cancel-btn">
+                  Cancel
+                </button>
+                <button onClick={handleSaveEdit} className="save-btn">
+                  Save
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      ) : (
-        <p className="comment-text">{comment.text}</p>
-      )}
-
-      <div className="comment-actions">
-        <div className="action-item">
-          <button className="icon-btn" onClick={() => onLike(comment._id)}>
-            {isLiked() ? (
-              <FaHeart className="icon liked" />
-            ) : (
-              <FaRegHeart className="icon" />
-            )}
-          </button>
-          <span>{comment.like || 0}</span>
-        </div>
-
-        {showReplyButton && (
-          <div className="action-item">
-            <Link to={`/comment/${comment._id}`} className="icon-btn">
-              <FaRegComment className="icon" />
-            </Link>
-            <Link to={`/comment/${comment._id}`}>Reply</Link>
-          </div>
+        ) : (
+          <p className="comment-text">{comment.text}</p>
         )}
+
+        <div className="comment-actions">
+          <div className="action-item">
+            <button 
+              className="icon-btn" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onLike(comment._id);
+              }}
+            >
+              {isLiked() ? (
+                <FaHeart className="icon liked" />
+              ) : (
+                <FaRegHeart className="icon" />
+              )}
+            </button>
+            <span>{comment.like || 0}</span>
+          </div>
+
+          {/* Show reply count instead of reply button */}
+          <div className="action-item">
+            <div className="icon-btn">
+              <FaRegComment className="icon" />
+            </div>
+            <span>{replyCount} {replyCount === 1 ? 'Reply' : 'Replies'}</span>
+          </div>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

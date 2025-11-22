@@ -1409,6 +1409,71 @@
   }
 }
 
+/* Thread enhancements using existing design */
+.reply-thread {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.replying-to-indicator {
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  color: var(--text-tertiary);
+  font-size: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.replying-to-indicator span {
+  font-style: italic;
+}
+
+/* Use existing comment card styles - no changes needed */
+.replies-section .comment-card {
+  margin-bottom: 0;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.replies-section .comment-card:last-child {
+  border-bottom: none;
+}
+
+/* Keep all your existing styles - just adding thread indicators */
+.original-post-section,
+.replied-comment-section,
+.replies-section {
+  background: var(--card-bg);
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.section-title {
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  margin: 0;
+  background: var(--card-bg);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reply-to-main {
+  background: var(--card-bg);
+  padding: 20px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 2px;
+}
+
+.reply-to-main h4 {
+  color: var(--text-primary);
+  font-size: 16px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+
 /* Add to your existing CSS */
 .comment-thread-page {
   margin-top: 40px; /* Push content below fixed navbar */

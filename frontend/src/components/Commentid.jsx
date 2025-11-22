@@ -51,55 +51,55 @@ const Commentid = () => {
   };
 
   // Render original post preview
-// Render original post preview
-const renderPostPreview = () => {
-  if (!displayThread?.comment) return null;
-  
-  const comment = displayThread.comment;
-  
-  // Check if it's a regular post or anonymous post
-  if (comment.post) {
-    // Regular post
-    const post = comment.post;
-    return (
-      <div className="original-post-section">
-        <h4 className="section-title">Original Post</h4>
-        <div className="post-preview">
-          <div className="post-header">
-            <img src={post.user?.profile || "/default-avatar.jpg"} alt="" className="post-avatar" />
-            <div className="post-user-info">
-              <span className="username">{post.user?.username}</span>
-              <span className="post-time">{timeAgo(post.createdAt)}</span>
+  const renderPostPreview = () => {
+    if (!displayThread?.comment) return null;
+    
+    const comment = displayThread.comment;
+    
+    // Check if it's a regular post or anonymous post
+    if (comment.post) {
+      // Regular post
+      const post = comment.post;
+      return (
+        <div className="original-post-section">
+          <h4 className="section-title">Original Post</h4>
+          <div className="post-preview">
+            <div className="post-header">
+              <img src={post.user?.profile || "/default-avatar.jpg"} alt="" className="post-avatar" />
+              <div className="post-user-info">
+                <span className="username">{post.user?.username}</span>
+                <span className="post-time">{timeAgo(post.createdAt)}</span>
+              </div>
             </div>
+            <p className="post-text">{post.text}</p>
+            {post.image && <img src={post.image} alt="" className="post-image-preview" />}
           </div>
-          <p className="post-text">{post.text}</p>
-          {post.image && <img src={post.image} alt="" className="post-image-preview" />}
         </div>
-      </div>
-    );
-  } else if (comment.anonymous) {
-    // Anonymous post
-    const anonymousPost = comment.anonymous;
-    return (
-      <div className="original-post-section">
-        <h4 className="section-title">Original Anonymous Post</h4>
-        <div className="post-preview">
-          <div className="post-header">
-            <img src="/ghost.jpg" alt="" className="post-avatar" />
-            <div className="post-user-info">
-              <span className="username">Anonymous</span>
-              <span className="post-time">{timeAgo(anonymousPost.createdAt)}</span>
+      );
+    } else if (comment.anonymous) {
+      // Anonymous post
+      const anonymousPost = comment.anonymous;
+      return (
+        <div className="original-post-section">
+          <h4 className="section-title">Original Anonymous Post</h4>
+          <div className="post-preview">
+            <div className="post-header">
+              <img src="/ghost.jpg" alt="" className="post-avatar" />
+              <div className="post-user-info">
+                <span className="username">Anonymous</span>
+                <span className="post-time">{timeAgo(anonymousPost.createdAt)}</span>
+              </div>
             </div>
+            <p className="post-text">{anonymousPost.text}</p>
+            {anonymousPost.image && <img src={anonymousPost.image} alt="" className="post-image-preview" />}
           </div>
-          <p className="post-text">{anonymousPost.text}</p>
-          {anonymousPost.image && <img src={anonymousPost.image} alt="" className="post-image-preview" />}
         </div>
-      </div>
-    );
-  }
-  
-  return null;
-};
+      );
+    }
+    
+    return null;
+  };
+
   // ⭐ Optimistic Like for comments and replies
   const handleLike = async (commentId) => {
     if (!userInfo || !localThread) return;
@@ -233,37 +233,44 @@ const renderPostPreview = () => {
     <div>
       <CommentNav />
       <div className="comment-thread-page">
-        {/* Original Post at the top - like Twitter */}
+        {/* Original Post at the top */}
         {renderPostPreview()}
         
         {/* Original comment that was replied to */}
         {displayThread?.comment && (
           <div className="replied-comment-section">
-            <h4 className="section-title">Replying to</h4>
+            <h4 className="section-title">Comment</h4>
             <CommentCard
               comment={displayThread.comment}
               onLike={handleLike}
               onFollowToggle={handleFollowToggle}
-              showReplyButton={true}
+              showReplyButton={false} // Entire card is clickable now
               showOptions={true}
+              replyCount={displayThread.replies?.length || 0} // Simple: just use the length
             />
           </div>
         )}
         
-        {/* Replies with proper nesting */}
+        {/* Replies with proper nesting - showing parent comment for each reply */}
         {displayThread?.replies?.length > 0 && (
           <div className="replies-section">
             <h4 className="section-title">Replies ({displayThread.replies.length})</h4>
             {displayThread.replies.map((reply) => (
-              <CommentCard 
-                comment={reply} 
-                key={reply._id} 
-                onLike={handleLike}
-                onFollowToggle={handleFollowToggle}
-                showReplyButton={true}
-                parentComment={displayThread.comment} // Shows "replying to @username"
-                showOptions={true}
-              />
+              <div key={reply._id} className="reply-thread">
+                {/* Show who this reply is replying to */}
+                <div className="replying-to-indicator">
+                  <span>Replying to @{displayThread.comment?.author?.username}</span>
+                </div>
+                <CommentCard 
+                  comment={reply} 
+                  onLike={handleLike}
+                  onFollowToggle={handleFollowToggle}
+                  showReplyButton={false} // Entire card is clickable now
+                  parentComment={displayThread.comment}
+                  showOptions={true}
+                  replyCount={0} // Replies don't have nested replies
+                />
+              </div>
             ))}
           </div>
         )}
