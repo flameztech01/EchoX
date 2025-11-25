@@ -5,6 +5,7 @@ import {
   getPost,
   searchPost,
   userPosts,
+  userPost,
   editPost,
   deletePost,
   likePost,
@@ -53,6 +54,7 @@ router.get("/", protect, getPosts);
 router.get("/:id", protect, getPost);
 router.get("/search/:text", protect, searchPost);
 router.get("/user-post", protect, userPosts);
+router.get('/user-post/:id', protect, userPost);
 router.put("/edit-post", protect, editPost);
 router.post("/delete", protect, deletePost);
 router.patch("/:id/like", protect, likePost);

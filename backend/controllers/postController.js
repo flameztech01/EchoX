@@ -112,6 +112,22 @@ const userPosts = asyncHandler(async (req, res, next) => {
   res.status(200).json(userPost);
 });
 
+//posts posted by a user i saw 
+// Posts posted by user
+const userPost = asyncHandler(async (req, res, next) => {
+  const userId = req.params.id; // Get from URL params, not from req.user
+
+  const userPost = await Post.find({ user: userId })
+    .populate('user', 'name username profile') // Populate user details
+    .sort({ createdAt: -1 });
+
+  if (!userPost || userPost.length === 0) {
+    return res.status(200).json([]); // Return empty array instead of error
+  }
+
+  res.status(200).json(userPost);
+});
+
 //Edit Post
 const editPost = asyncHandler(async (req, res, next) => {
   const { text } = req.body;
@@ -175,6 +191,7 @@ export {
   getPost,
   searchPost,
   userPosts,
+  userPost,
   editPost,
   deletePost,
   likePost,

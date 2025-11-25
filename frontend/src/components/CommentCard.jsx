@@ -216,7 +216,7 @@ const CommentCard = ({
             <div className="icon-btn">
               <FaRegComment className="icon" />
             </div>
-            <span>{replyCount} {replyCount === 1 ? 'Reply' : 'Replies'}</span>
+            <span>{comment.replyCount || 0}</span>
           </div>
         </div>
       </div>

@@ -28,7 +28,19 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 url: `${POST_URL}/${id}/like`,
                 method: 'PATCH'
             })
-        })
+        }),
+        getUserPost: builder.query({
+            query: (userId) => ({
+                url: `${POST_URL}/user-post/${userId}`,
+                method: 'GET'
+            })
+        }),
+        getPostsByUser: builder.query({
+            query: (id) => ({
+                url: `${POST_URL}/user-post`,
+                method: 'GET'
+            })
+        }),
     })
 })
 
@@ -37,4 +49,5 @@ export const {
     useGetPostsQuery,
     useGetOnePostQuery,
     useLikePostMutation,
+    useGetUserPostQuery,
 } = postApiSlice;

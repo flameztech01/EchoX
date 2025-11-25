@@ -24,7 +24,9 @@ const commentSchema = new mongoose.Schema({
     likedBy: [{  // Add this field
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }],
+    // Add this field to store reply count
+    replyCount: {type: Number, default: 0},
 }, 
 {
     timestamps: true
