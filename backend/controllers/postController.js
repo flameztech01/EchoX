@@ -2,6 +2,7 @@ import express from "express";
 import Post from "../models/postModel.js";
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
+import { createNotification } from "./notificationController.js";
 
 //Create post
 const createPost = asyncHandler(async (req, res, next) => {
@@ -165,8 +166,15 @@ const deletePost = asyncHandler(async (req, res, next) => {
 });
 
 //Like post
+
 const likePost = asyncHandler(async (req, res, next) => {
-  const post = await Post.findById(req.params.id);
+  const post = await Post.findById(req.params.id)
+    .populate('user', '_id notificationSettings');
+
+  if (!post) {
+    res.status(404);
+    throw new Error("Post not found");
+  }
 
   // Check if user already liked
   const alreadyLiked = post.likedBy.includes(req.user._id);
@@ -179,6 +187,17 @@ const likePost = asyncHandler(async (req, res, next) => {
     // Like
     post.like += 1;
     post.likedBy.push(req.user._id);
+    
+    // Create notification ONLY if liking (not unliking)
+    // And only if the post owner is not liking their own post
+    if (post.user._id.toString() !== req.user._id.toString()) {
+      await createNotification(post.user._id, {
+        type: 'like',
+        senderId: req.user._id,
+        postId: post._id,
+        message: `${req.user.username} liked your post`
+      });
+    }
   }
 
   await post.save();

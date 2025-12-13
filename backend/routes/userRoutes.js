@@ -10,17 +10,17 @@ import {
   getAnyUserProfile,
   updateProfile,
   logoutUser,
-  forgotPassword,           
-  verifyResetOTP,           
-  resetPassword,            
-  resendResetOTP,           
+  forgotPassword,
+  verifyResetOTP,
+  resetPassword,
+  resendResetOTP,
   deleteUser,
   followUser,
   unfollowUser,
   getFollowers,
   getFollowing,
   getFollowStats,
-  search
+  search,
 } from "../controllers/userController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import multer from "multer";
@@ -63,8 +63,8 @@ cloudinary.api
 
 // ===== AUTHENTICATION ROUTES =====
 router.post("/google", googleAuth);
-router.post('/verify-otp', verifyOTP);
-router.post('/resend-otp', resendOTP);
+router.post("/verify-otp", verifyOTP);
+router.post("/resend-otp", resendOTP);
 router.post("/login", loginUser);
 router.post("/register", registerUser);
 router.post("/logout", logoutUser);
@@ -80,7 +80,7 @@ router.put("/dark-mode", protect, updateDarkMode);
 router.get("/profile", protect, getUserProfile);
 router.get("/profile/:id", protect, getAnyUserProfile);
 router.put("/update-profile", protect, upload.single("image"), updateProfile);
-router.delete('/delete', protect, deleteUser);
+router.delete("/delete", protect, deleteUser);
 
 // ===== FOLLOW/UNFOLLOW ROUTES =====
 router.post("/follow/:id", protect, followUser);
@@ -96,6 +96,6 @@ router.get("/following/:id", protect, getFollowing); // specific user
 router.get("/follow-stats", protect, getFollowStats); // current user
 router.get("/follow-stats/:id", protect, getFollowStats); // specific user
 
-router.get('/search', protect, search);
+router.get("/search", protect, search);
 
 export default router;

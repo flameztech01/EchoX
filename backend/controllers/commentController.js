@@ -29,6 +29,21 @@ const createComment = asyncHandler(async (req, res) => {
     await Comment.findByIdAndUpdate(parentComment, {
       $inc: { replyCount: 1 }
     });
+    
+    // Get parent comment to notify its author
+    const parentCommentDoc = await Comment.findById(parentComment)
+      .populate('author', '_id notificationSettings');
+    
+    // Notify parent comment author about reply (if not replying to self)
+    if (parentCommentDoc && parentCommentDoc.author._id.toString() !== req.user._id.toString()) {
+      await createNotification(parentCommentDoc.author._id, {
+        type: 'reply',
+        senderId: req.user._id,
+        postId: post,
+        commentId: comment._id,
+        message: `${req.user.username} replied to your comment`
+      });
+    }
   }
 
   // Push comment to the correct model
@@ -36,7 +51,23 @@ const createComment = asyncHandler(async (req, res) => {
     await Post.findByIdAndUpdate(post, {
       $push: { comments: comment._id },
     });
+    
+    // Get post to notify its owner about comment
+    const postDoc = await Post.findById(post)
+      .populate('user', '_id notificationSettings');
+    
+    // Notify post owner about new comment (if not commenting on own post)
+    if (postDoc && postDoc.user._id.toString() !== req.user._id.toString()) {
+      await createNotification(postDoc.user._id, {
+        type: 'comment',
+        senderId: req.user._id,
+        postId: post,
+        commentId: comment._id,
+        message: `${req.user.username} commented on your post`
+      });
+    }
   }
+  
   if (anonymous) {
     await Anonymous.findByIdAndUpdate(anonymous, {
       $push: { comments: comment._id },
@@ -45,6 +76,7 @@ const createComment = asyncHandler(async (req, res) => {
 
   res.status(201).json(comment);
 });
+
 
 // Get ghost comments
 // Get ghost comments
@@ -154,11 +186,12 @@ const deleteComment = asyncHandler(async (req, res) => {
 
 //Like Comment
 const likeComment = asyncHandler(async (req, res, next) => {
-  const comment = await Comment.findById(req.params.id);
+  const comment = await Comment.findById(req.params.id)
+    .populate('author', '_id notificationSettings');
 
   if (!comment) {
     res.status(404);
-    throw new Error("Anonymous wey you wan like no dey again");
+    throw new Error("Comment not found");
   }
 
   // Check if user already liked
@@ -172,6 +205,17 @@ const likeComment = asyncHandler(async (req, res, next) => {
     // Like
     comment.like += 1;
     comment.likedBy.push(req.user._id);
+    
+    // Create notification for comment owner (if not liking own comment)
+    if (comment.author && comment.author._id.toString() !== req.user._id.toString()) {
+      await createNotification(comment.author._id, {
+        type: 'comment_like',
+        senderId: req.user._id,
+        commentId: comment._id,
+        postId: comment.post,
+        message: `${req.user.username} liked your comment`
+      });
+    }
   }
 
   await comment.save();

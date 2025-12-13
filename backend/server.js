@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { errorHandler, notFound} from './middleware/errorMiddleware.js';
 import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 import anonymousRoutes from './routes/anonymousRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import cookieParser from 'cookie-parser';
@@ -16,7 +17,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/echox';
 const allowedOrigins = process.env.NODE_ENV === 'production' 
-    ? ['https://echox.site']
+    ? ['https://echox.site', 'capacitor://echox.site', 'capacitor://localhost', 'http://localhost']
     : ['http://localhost:3000', 'https://echox-wzh0.onrender.com'];
 
 // Middleware
@@ -35,6 +36,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/post', postRoutes);
 app.use('/api/anonymous', anonymousRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 //Error Middleware
 app.use(errorHandler);

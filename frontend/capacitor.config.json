@@ -1,0 +1,6 @@
+{
+  "appId": "com.flameztech.echox",
+  "appName": "EchoX",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

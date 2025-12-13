@@ -33,6 +33,7 @@ import DeleteAccount from './screens/DeleteAccount.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
 import SendOtp from './screens/SendOtp.jsx';
 import Commentid from './components/Commentid.jsx';
+import NotificationScreen from './screens/NotificationScreen.jsx';
 
 import ForgotPassword from './screens/ForgotPassword.jsx';
 import SendPasswordOtp from './screens/SendPasswordOtp.jsx';
@@ -71,6 +72,7 @@ const router = createBrowserRouter(
         <Route path='delete-account' element={<DeleteAccount />} />
         <Route path='settings' element={<SettingsScreen />}  />
         <Route path='comment/:id'  element={<Commentid />}/>
+        <Route path='notifications' element={<NotificationScreen />} />
 
         <Route path='search' element={<Search />} />
       </Route>
