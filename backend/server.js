@@ -17,16 +17,25 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/echox';
 const allowedOrigins = process.env.NODE_ENV === 'production' 
-    ? ['https://echox.site', 'capacitor://echox.site', 'capacitor://localhost', 'http://localhost']
+    ? ['https://echox.site', 'capacitor://localhost', 'http://localhost']
     : ['http://localhost:3000', 'https://echox-wzh0.onrender.com'];
 
-// Middleware
 app.use(cors({
-    origin: allowedOrigins,
+    origin: function(origin, callback) {
+        // allow requests with no origin (mobile apps, curl)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    methods: ['GET','POST','PUT','DELETE','PATCH','OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
 app.use(bodyParser.json());
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: true }));
